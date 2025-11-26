@@ -31,8 +31,8 @@ def set_step(w1, w2, w3, w4):
 def step_motor(step, direction=1, delay=0.01): 
     for _ in range (steps): 
         for step in (step_seq if direction > 0 else reversed(step_seq)): 
-        set_step(*step) 
-        sleep(delay) 
+            set_step(*step) 
+            sleep(delay) 
 
 try:
     while True:
