@@ -1,0 +1,61 @@
+image_path,true_label,predicted_label
+test_set\plant_1\p1.1_aug_9.jpg,plant_1,plant_5
+test_set\plant_1\p1.6_aug_4.jpg,plant_1,plant_5
+test_set\plant_1\p1.7_aug_19.jpg,plant_1,plant_9
+test_set\plant_2\p2.1_aug_12.jpg,plant_2,plant_7
+test_set\plant_2\p2.1_aug_18.jpg,plant_2,plant_9
+test_set\plant_2\p2.1_aug_7.jpg,plant_2,plant_7
+test_set\plant_2\p2.3_aug_8.jpg,plant_2,plant_1
+test_set\plant_3\p3.3_aug_9.jpg,plant_3,plant_6
+test_set\plant_3\p3.4_aug_3.jpg,plant_3,plant_7
+test_set\plant_3\p3.9_aug_16.jpg,plant_3,plant_1
+test_set\plant_4\p4.2_aug_13.jpg,plant_4,plant_9
+test_set\plant_4\p4.4_aug_6.jpg,plant_4,plant_3
+test_set\plant_5\p5.1_aug_6.jpg,plant_5,plant_4
+test_set\plant_5\p5.2_aug_11.jpg,plant_5,plant_8
+test_set\plant_5\p5.3_aug_8.jpg,plant_5,plant_1
+test_set\plant_5\p5.4_aug_10.jpg,plant_5,plant_1
+test_set\plant_5\p5.5_aug_17.jpg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.47 (1).jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.47 (2).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.47 (3).jpeg,plant_5,plant_3
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.47 (4).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.47 (5).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.47.jpeg,plant_5,plant_2
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.50.jpeg,plant_5,plant_3
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.56.jpeg,plant_5,plant_3
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.57 (1).jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.57 (2).jpeg,plant_5,plant_1
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.57.jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.58 (4).jpeg,plant_5,plant_2
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.58 (5).jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.58.jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.59 (1).jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.59 (3).jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.36.59 (4).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.00 (1).jpeg,plant_5,plant_3
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.00.jpeg,plant_5,plant_3
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01 (1).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01 (2).jpeg,plant_5,plant_3
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01 (3).jpeg,plant_5,plant_9
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01 (4).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01 (5).jpeg,plant_5,plant_8
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01 (7).jpeg,plant_5,plant_4
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01 (9).jpeg,plant_5,plant_2
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.01.jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.02 (1).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.02 (2).jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.02 (3).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.03 (1).jpeg,plant_5,plant_3
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.03 (2).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.03.jpeg,plant_5,plant_9
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.04 (1).jpeg,plant_5,plant_6
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.04 (2).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.04 (3).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.04 (4).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.04 (6).jpeg,plant_5,plant_7
+test_set\plant_5\WhatsApp Image 2025-11-04 at 14.37.04.jpeg,plant_5,plant_7
+test_set\plant_8\p8.4_aug_15.jpg,plant_8,plant_1
+test_set\plant_9\p9.2_aug_4.jpg,plant_9,plant_7
+test_set\plant_9\p9.2_aug_7.jpg,plant_9,plant_7
+test_set\plant_9\p9.3_aug_6.jpg,plant_9,plant_5
