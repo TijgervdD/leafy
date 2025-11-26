@@ -28,7 +28,7 @@ def set_step(w1, w2, w3, w4):
     IN3.value = w3 
     IN4.value = w4 
 
-def step_motor(step, direction=1, delay=0.01): 
+def step_motor(step, direction, delay): 
     for _ in range (steps): 
         for step in (step_seq if direction > 0 else reversed(step_seq)): 
             set_step(*step) 
@@ -38,7 +38,8 @@ try:
     while True:
         steps = int(input("Enter number of steps (e.g., 512 for one full revolution): "))
         direction = int(input("Enter direction ( 1 for forward, -1 for backward): "))
-        step_motor(steps, direction)
+        delay = int(input("how faastt (0.01 is normal): "))
+        step_motor(steps, direction, delay)
 except KeyboardInterrupt:
     print("program stopped by user")
 
