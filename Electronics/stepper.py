@@ -38,11 +38,10 @@ try:
     while True:
         steps = int(input("Enter number of steps (e.g., 512 for one full revolution): "))
         direction = int(input("Enter direction ( 1 for forward, -1 for backward): "))
-        delay = int(input("how faastt (0.01 is normal): "))
+        delay = float(input("how faastt (0.01 is normal): "))
         step_motor(steps, direction, delay)
 except KeyboardInterrupt:
     print("program stopped by user")
 
 #steps = 512 #512 is 1 full rotation 
-#direction = 1 # 1 is forward, -1 is backward 
-#step_motor(steps, direction)
+#direction = 1 # 1 is forward, -1 is backward #step_motor(steps, direction)
