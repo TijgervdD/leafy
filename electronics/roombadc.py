@@ -60,7 +60,7 @@ try:
         pulses_per_rev = 20  # zelf meten of documentatie
         rpm = (pulses / pulses_per_rev) * 60
 
-        print(f"Pulsen/s: {pulses}   RPM: {rpm:.1f}")
+        print(f"Pulse/s: {pulses}   RPM: {rpm:.1f}")
 
 except KeyboardInterrupt:
     pass
