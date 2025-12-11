@@ -32,7 +32,7 @@ GPIO.setup(ECHO, GPIO.IN)
 
 # PWM setup
 pwm1 = GPIO.PWM(EN_M1, 1000)
-pwm2 = GPIO.PWM(EN_M_M2, 1000)
+pwm2 = GPIO.PWM(EN_M2, 1000)
 pwm1.start(0)
 pwm2.start(0)
 
