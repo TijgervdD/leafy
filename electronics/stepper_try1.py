@@ -18,7 +18,7 @@ kit = MotorKit(i2c=board.I2C())
 
 for i in range(500):
     
-    kit.stepper1.onestep()
+    kit.stepper2.onestep()
     time.sleep(0.01)
 
 # The below loop will run 500 times. Each loop it will move two step, anti-Clockwise, then pause for 0.01 seconds
@@ -26,7 +26,7 @@ for i in range(500):
 
 for i in range(500):
     
-    kit.stepper1.onestep(direction=stepper.BACKWARD, style=stepper.DOUBLE)
+    kit.stepper2.onestep(direction=stepper.BACKWARD, style=stepper.DOUBLE)
     time.sleep(0.01)  
 
 # The below loop will run 500 times. Each loop it will move a Micro-step, anti-Clockwise, then pause for 0.01 seconds
@@ -38,4 +38,4 @@ for i in range(500):
     time.sleep(0.01)
 
 # The below line will de-energise the Stepper Motor so it can freely move
-kit.stepper1.release()
+kit.stepper2.release()
