@@ -98,7 +98,7 @@ try:
         afstand = meet_afstand()
         print(f"Afstand: {afstand:.1f} cm")
 
-        if afstand < 5:
+        if afstand < 10:
             print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
             motors_stop()
             break
