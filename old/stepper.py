@@ -1,47 +1,139 @@
-from gpiozero import OutputDevice
-from time import sleep 
-from multiprocessing import process 
-import time 
-import keyboard 
+import RPi.GPIO as GPIO
+from gpiozero import PWMOutputDevice
+from time import sleep
+import pygame
+import sys
+from adafruit_motorkit import MotorKit
+from adafruit_motor import stepper
 
-#pin definition 
 
-IN1 = OutputDevice(14) 
-IN2 = OutputDevice(15) 
-IN3 = OutputDevice(18) 
-IN4 = OutputDevice(23) 
+def clockwise():
 
-step_seq= [ 
-    [1,0,0,0], #first step: activates the first wire 
-    [1,1,0,0], #second step: activates the first and second wire 
-    [0,1,0,0], 
-    [0,1,1,0], 
-    [0,0,1,0], 
-    [0,0,1,1], 
-    [0,0,0,1], 
-    [1,0,0,1] 
-    ] 
+	global arr1
+	global arr2
+	
+	# rotating array for stepper control
+	arrOUT = arr1[3:] + arr1[:3]
+	arr1 = arr2
+	arr2 = arrOUT
+	
+	# send pulse to GPIO pins
+	GPIO.output(chan_list, arrOUT)
+	sleep(DELAY)
+	
+	return True
+	
+def counterclockwise():
+	global arr1
+	global arr2
+	
+	arrOUT = arr1[1:] + arr1[:1]
+	arr1 = arr2
+	arr2 = arrOUT
+	
+	GPIO.output(chan_list, arrOUT)
+	sleep(DELAY)
+	
+	return True
 
-def set_step(w1, w2, w3, w4): 
-    IN1.value = w1 
-    IN2.value = w2 
-    IN3.value = w3 
-    IN4.value = w4 
+def double_clockwise():
 
-def step_motor(step, direction, delay): 
-    for _ in range (steps): 
-        for step in (step_seq if direction > 0 else reversed(step_seq)): 
-            set_step(*step) 
-            sleep(delay) 
+	kit.stepper1.onestep(direction=stepper.FORWARD, style=stepper.SINGLE)
+	kit.stepper2.onestep(direction=stepper.BACKWARD, style=stepper.SINGLE)
+	sleep(DELAY)
 
-try:
-    while True:
-        steps = int(input("Enter number of steps (e.g., 512 for one full revolution): "))
-        direction = int(input("Enter direction ( 1 for forward, -1 for backward): "))
-        delay = float(input("how faastt (0.01 is normal): "))
-        step_motor(steps, direction, delay)
-except KeyboardInterrupt:
-    print("program stopped by user")
+	return True
 
-#steps = 512 #512 is 1 full rotation 
-#direction = 1 # 1 is forward, -1 is backward #step_motor(steps, direction)
+def double_counterclockwise():
+
+	kit.stepper1.onestep(direction=stepper.BACKWARD, style=stepper.SINGLE)
+	kit.stepper2.onestep(direction=stepper.FORWARD, style=stepper.SINGLE)
+	sleep(DELAY)
+
+	return True
+
+
+if __name__ == '__main__':
+
+	pygame.init()
+
+	# delay between steps of the motors
+	DELAY = 0.001
+	chan_list = [23, 27, 18, 17]
+	chan_list.reverse()
+	
+	# used for turning motors on and off
+	ENA = PWMOutputDevice(25)
+	ENB = PWMOutputDevice(24)
+
+	pygame.display.set_mode((100, 100))
+
+	GPIO.setmode(GPIO.BCM)
+	GPIO.setwarnings(False)
+
+	for pin in chan_list:
+		print(f'setup pin: {pin}')
+		GPIO.setup(pin, GPIO.OUT)
+
+	# pin control for middle motor
+	arr1 = [1, 1, 0, 0]
+	arr2 = [0, 1, 1, 0]
+
+	# control for left and right motors
+	kit = MotorKit()
+
+	try:
+
+		x_axis_forward = False
+		x_axis_backward = False
+		y_axis_forward = False
+		y_axis_backward = False
+
+		while True:
+			# pygame for capturing key events
+			events = pygame.event.get()
+			for event in events:
+
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_w:
+						x_axis_forward = True
+					elif event.key == pygame.K_s:
+						x_axis_backward = True
+					elif event.key == pygame.K_a:
+						ENA.value = 1
+						ENB.value = 1
+						y_axis_forward = True
+					elif event.key == pygame.K_d:
+						ENA.value = 1
+						ENB.value = 1
+						y_axis_backward = True
+
+				elif event.type == pygame.KEYUP:
+					if event.key == pygame.K_w:
+						x_axis_forward = False
+					elif event.key == pygame.K_s:
+						x_axis_backward = False
+					elif event.key == pygame.K_a:
+						ENA.value = 0
+						ENB.value = 0
+						y_axis_forward = False
+					elif event.key == pygame.K_d:
+						ENA.value = 0
+						ENB.value = 0
+						y_axis_backward = False
+
+			if x_axis_forward:
+				double_clockwise()
+			if x_axis_backward:
+				double_counterclockwise()
+
+			if y_axis_forward:
+				clockwise()
+			if y_axis_backward:
+				counterclockwise()
+
+	except KeyboardInterrupt:
+		print('Program stopped by user')
+		GPIO.output(chan_list, (0, 0, 0, 0))
+		GPIO.cleanup()
+		sys.exit()
