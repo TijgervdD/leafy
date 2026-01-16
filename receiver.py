@@ -3,7 +3,7 @@ import time
 from pyrf24 import RF24, RF24_PA_MIN
 
 # Setup voor Pi 5: CE op GPIO 25, CSN op SPI0 (CE0 / GPIO 8)
-radio = RF24(25, 0)
+radio = RF24(25, 1)
 
 # Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal)
 address = b"0001\x00" 
