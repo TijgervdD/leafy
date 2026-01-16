@@ -25,6 +25,8 @@ address = b"0001\x00"
 
 def setup():
   radio.begin()
+  radio.setDataRate(RF24_250KBPS) # Slower air speed is more stable
+  radio.setPALevel(RF24_PA_MIN)
   radio.openReadingPipe(1, address)
   radio.setPALevel(RF24_PA_MIN)
   radio.startListening()
