@@ -9,20 +9,20 @@ GPIO.setmode(GPIO.BCM)
 
 # Motor 1
 IN1_M1 = 17
-IN2_M1 = 27
-EN_M1  = 18   # PWM voor motor 1
+IN2_M1 = 18
+#EN_M1  = 18   # PWM voor motor 1
 
 # Motor 2
-IN1_M2 = 22
-IN2_M2 = 25
-EN_M2  = 13   # PWM voor motor 2
+IN1_M2 = 27
+IN2_M2 = 22
+#EN_M2  = 13   # PWM voor motor 2
 
 # HC-SR04 pins
 TRIG = 20
 ECHO = 21
 
 # Motor pin setup
-motor_pins = [IN1_M1, IN2_M1, EN_M1, IN1_M2, IN2_M2, EN_M2]
+motor_pins = [IN1_M1, IN2_M1, IN1_M2, IN2_M2]
 for p in motor_pins:
     GPIO.setup(p, GPIO.OUT)
 
@@ -31,10 +31,10 @@ GPIO.setup(TRIG, GPIO.OUT)
 GPIO.setup(ECHO, GPIO.IN)
 
 # PWM setup
-pwm1 = GPIO.PWM(EN_M1, 1000)
-pwm2 = GPIO.PWM(EN_M2, 1000)
-pwm1.start(0)
-pwm2.start(0)
+#pwm1 = GPIO.PWM(EN_M1, 1000)
+#pwm2 = GPIO.PWM(EN_M2, 1000)
+#pwm1.start(0)
+#pwm2.start(0)
 
 # =====================================================
 # MOTOR FUNCTIES

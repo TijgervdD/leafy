@@ -9,13 +9,13 @@ GPIO.setmode(GPIO.BCM)
 
 # Motor 1
 IN1_M1 = 17
-IN2_M1 = 27
-EN_M1  = 18   # PWM voor motor 1
+IN2_M1 = 18
+EN_M1  = 23   # PWM voor motor 1
 
 # Motor 2
 IN1_M2 = 22
-IN2_M2 = 25
-EN_M2  = 13   # PWM voor motor 2
+IN2_M2 = 27
+EN_M2  = 24   # PWM voor motor 2
 
 # Setup pins
 motor_pins = [IN1_M1, IN2_M1, EN_M1, IN1_M2, IN2_M2, EN_M2]

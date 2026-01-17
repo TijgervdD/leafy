@@ -15,7 +15,7 @@ while True:
     sleep(3)
 
 #Below will rotate the Standard servo to the 180 degree point
-    kit.servo[0].angle = 180
+    kit.servo[0].angle = 90
 #Below will make the system wait for 3 seconds
     sleep(3) 
 #Below will rotate the Standard servo to the 180 degree point

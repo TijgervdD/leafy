@@ -3,7 +3,7 @@ import time
 from pyrf24 import RF24, RF24_PA_MIN
 
 # Setup voor Pi 5: CE op GPIO 25, CSN op SPI0 (CE0 / GPIO 8)
-radio = RF24(25, 1)
+radio = RF24(25, 0)
 
 # Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal)
 address = b"0001\x00" 
@@ -11,14 +11,14 @@ address = b"0001\x00"
 #def setup():
 
 def setup():
-    # Try to initialize
+  # Try to initialize
     if not radio.begin():
         print("FOUT: nRF24L01 niet gevonden!")
         sys.exit()
 
     # Lower the data rate to make it more resistant to noise
-    radio.setDataRate(RF24_250KBPS) 
-    radio.setPALevel(RF24_PA_MIN)
+ #   radio.setDataRate(RF24_250KBPS) 
+  #  radio.setPALevel(RF24_PA_MIN)
     
     # ... rest of your setup
  #   if not radio.begin():

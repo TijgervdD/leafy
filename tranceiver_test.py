@@ -13,7 +13,7 @@
  
 import sys
 import time
-from pyrf24 import RF24, RF24_PA_MIN
+from pyrf24 import RF24, RF24_PA_MIN, RF24_250KBPS
 
 # Setup voor Pi 5: CE op GPIO 25, CSN op SPI0 (CE0 / GPIO 8)
 radio = RF24(25, 0)
@@ -24,9 +24,9 @@ address = b"0001\x00"
 #def setup():
 
 def setup():
-  radio.begin()
-  radio.setDataRate(RF24_250KBPS) # Slower air speed is more stable
-  radio.setPALevel(RF24_PA_MIN)
+  radio.begin() # Slower air speed is more stable
+  radio.setDataRate(RF24_250KBPS)
+#  radio.setPALevel(RF24_PA_MIN)
   radio.openReadingPipe(1, address)
   radio.setPALevel(RF24_PA_MIN)
   radio.startListening()
