@@ -9,6 +9,7 @@ from adafruit_servokit import ServoKit
 import sys
 import time
 from pyrf24 import RF24, RF24_PA_MIN
+GPIO.setmode(GPIO.BCM)
 
 # ==============================================================================
 # PIN layout and initial setup
@@ -37,6 +38,13 @@ radio = RF24(25, 0)
 # Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal)
 address = b"0001\x00" 
 
+# HC-SR04 pins (sonar sensor)
+TRIG = 6
+ECHO = 5
+# Ultrasone sensor pins
+GPIO.setup(TRIG, GPIO.OUT)
+GPIO.setup(ECHO, GPIO.IN)
+
 # =====================================================================================
 
 def initialize():
@@ -49,6 +57,7 @@ def initialize():
     kit = ServoKit(channels=16)
     #Desiding the initial angle that the servo which is attatched to Port 0 will be.
     kit.servo[0].angle = 90
+    kit.servo[2].angle = 0
 
 def eStop():
     # turn off all moving parts and return to safe state
@@ -62,9 +71,43 @@ def buttonPressedEstop()
 def endStop():
     # sensor measuring the end of the table
 
+def measuringDistance1():
+        # Distance sensor initialization - sensor measuring that a plant is nearby
+    # Trigger puls
+    GPIO.output(TRIG, True)
+    time.sleep(0.00001)
+    GPIO.output(TRIG, False)
+
+    # Wachten op echo start
+    start_time = time.time()
+    while GPIO.input(ECHO) == 0:
+        start_time = time.time()
+
+    # Wachten op echo einde
+    stop_time = time.time()
+    while GPIO.input(ECHO) == 1:
+        stop_time = time.time()
+
+    # Tijdsverschil
+    time_elapsed = stop_time - start_time
+
+    # Geluidssnelheid: 34300 cm/s
+    distance = (time_elapsed * 34300) / 2
+
+    return distance
+
 def plantFound():
-    # sensor measuring that a plant is nearby
-    
+    while True:
+        Distance = measuringDistance1()
+        print(f"Afstand: {afstand:.1f} cm")
+
+#        if distance < 5:
+#            print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
+#            motors_stop()
+#            break
+
+        time.sleep(0.1)
+
 def startDrivingF():
     GPIO.output(IN1_M1, GPIO.HIGH)
     GPIO.output(IN2_M1, GPIO.LOW)
@@ -131,27 +174,24 @@ def radioListen():
         receiveRemoteControlData()
         radioLoop()
 
-def positionArmML(pos):
-    # control servo to move arm to pos from middle possition to Left
-    #Below will rotate the Standard servo to the 180 degree point
-    kit.servo[0].angle = -90
+def rotateArm(pos):
+    # control servo to move arm to pos
+    kit.servo[0].angle = pos
 
-def positionArmLR(pos):
-    # control servo to move arm to pos from left possition to right
-    kit.servo[0].angle = 180
+def extendArm(pos):
+    # control servo to extend the arm
+    kit.servo[1].angle = pos
 
-def positionArmRM(pos):
-    # control servo to move arm to pos from right possition to middle
-    kit.servo[0].angle = -90
-
+# =========================================================================================
+# LOOP
 while True:
-    if (buttonPressedEstop()):
-        eStop()
+    #if (buttonPressedEstop()):
+    #    eStop()
 
     match state:
         case 0:
             initialize()
-            state = 10
+            state = 20
         case 10: # Standby, wait for start command
             if (startButtonPressed):
                 state = 20
@@ -159,21 +199,27 @@ while True:
             startDrivingF()
             state = 30
         case 30:
-            if (plantFound()):
+            plantFound()
+                if afstand <5:
                 stopDriving()
                 state = 40
             if (endStop()):
                 stopDriving()
                 state = 10
         case 40:
-            extendArm()
+            rotateArm(0)
             state = 50
         case 50:
-            waterThePlant()
+            extendArm(40)
             state = 60
         case 60:
+            waterThePlant()
+            state = 70
+        case 80:
             retractArm()
+            state = 90
+        case 90:
+            rotateArm(90)
             state = 20
-
         case 999:
             exit()

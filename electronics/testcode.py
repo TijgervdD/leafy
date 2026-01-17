@@ -7,22 +7,25 @@ state = 0 # global statemachine variable
 #Below is an initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
 kit = ServoKit(channels=16)
 
-def initialize()
+def initialize():
     #Below desides the initial angle that the servo which is attatched to Port 0 will be. In this case we will make it zero degrees.
-    kit.servo[0].angle = 0
+    kit.servo[0].angle = 90
 
-def positionArmML(pos):
+def positionArm(pos):
     # control servo to move arm to pos from middle possition to Left
     #Below will rotate the Standard servo to the 180 degree point
-    kit.servo[0].angle = -90
+    kit.servo[0].angle = pos
+    sleep(3)
 
-def positionArmLR(pos):
+def positionArmLR():
     # control servo to move arm to pos from left possition to right
     kit.servo[0].angle = 180
+    sleep(3)
 
-def positionArmRM(pos):
+def positionArmRM():
     # control servo to move arm to pos from right possition to middle
-    kit.servo[0].angle = -90
+    kit.servo[0].angle = 90
+    sleep(3)
 #Below will create an infinite loop
 
 
@@ -32,13 +35,13 @@ while True:
             initialize()
             state = 10
         case 10: 
-            positionArmML()
+            positionArm(0)
             state = 20
         case 20:
-            positionArmLR()
+            positionArm(180)
             state = 30
         case 30:
-            positionArmRM()
+            positionArm(90)
             state = 40
         case 40:
             exit()
