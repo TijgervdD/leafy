@@ -66,8 +66,8 @@ def initialize():
     kit.servo[0].angle = 90
     kit.servo[1].angle = 0
 
-    distance1 = measuringDistance1()
-    distance2 = measuringDistance2()
+#    distance1 = measuringDistance1()
+#    distance2 = measuringDistance2()
 
 def eStop():
     # turn off all moving parts and return to safe state
@@ -80,53 +80,79 @@ def eStop():
 
 def endStop():
     # sensor measuring the end of the table
-    distance2 = measuringDistance2()
+    distance2 = measuringDistance()
     if distance2 < 5:
             print("!!! END OF TABLE DETECTED — STOP !!!")
             stopDriving()      
 
-def measuringDistance():
+def measuringDistance1():
         # Distance sensor initialization - sensor measuring that a plant is nearby
     # Trigger puls
-    GPIO.output(trig_pin, True)
+    GPIO.output(TRIG1, True)
     time.sleep(0.00001)
-    GPIO.output(trig_pin, False)
+    GPIO.output(TRIG1, False)
 
     # Wachten op echo start
     start_time = time.time()
-    while GPIO.input(echo_pin) == 0:
+    while GPIO.input(ECHO1) == 0:
         start_time = time.time()
 
     # Wachten op echo einde
     stop_time = time.time()
-    while GPIO.input(echo_pin) == 1:
+    while GPIO.input(ECHO1) == 1:
         stop_time = time.time()
 
     # Tijdsverschil
     time_elapsed = stop_time - start_time
 
     # Geluidssnelheid: 34300 cm/s
-    distance = (time_elapsed * 34300) / 2
+    distance1 = (time_elapsed * 34300) / 2
 
-    return distance
+    return distance1
+
+
+def measuringDistance2():
+        # Distance sensor initialization - sensor measuring that a plant is nearby
+    # Trigger puls
+    GPIO.output(TRIG2, True)
+    time.sleep(0.00001)
+    GPIO.output(TRIG2, False)
+
+    # Wachten op echo start
+    start_time = time.time()
+    while GPIO.input(ECHO2) == 0:
+        start_time = time.time()
+
+    # Wachten op echo einde
+    stop_time = time.time()
+    while GPIO.input(ECHO2) == 1:
+        stop_time = time.time()
+
+    # Tijdsverschil
+    time_elapsed = stop_time - start_time
+
+    # Geluidssnelheid: 34300 cm/s
+    distance2 = (time_elapsed * 34300) / 2
+
+    return distance2
 
 def plantFound():
     while True:
-        distance1 = measure_distance(TRIG1, ECHO1)
-        distance2 = measure_distance(TRIG2, ECHO2)
+        distance1 = measuringDistance1()
+        distance2 = measuringDistance2()
         
         print(f"Dist 1: {distance1:.1f} cm | Dist 2: {distance2:.1f} cm")
 
         # Specific check for Sensor 1
         if distance1 < 5:
             print("!!! PLANT DETECTED — STOPPING !!!")
-            motors_stop()
+            stopDriving()
             break
         
         # Specific check for Sensor 2
         elif distance2 < 5:
             print("!!! END OF TABLE DETECTED — STOP !!!")
-            motors_stop()
+            stopDriving()
             state = 10
             break
 
