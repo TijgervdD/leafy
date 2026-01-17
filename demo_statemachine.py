@@ -41,11 +41,18 @@ radio = RF24(25, 0)
 address = b"0001\x00" 
 
 # HC-SR04 pins (sonar sensor)
-TRIG = 6
-ECHO = 5
+TRIG1 = 6
+ECHO1 = 5
+
+TRIG2 = 12
+ECHO2 =13
+
 # Ultrasone sensor pins
-GPIO.setup(TRIG, GPIO.OUT)
-GPIO.setup(ECHO, GPIO.IN)
+GPIO.setup(TRIG1, GPIO.OUT)
+GPIO.setup(ECHO1, GPIO.IN)
+
+GPIO.setup(TRIG2, GPIO.OUT)
+GPIO.setup(ECHO2, GPIO.IN)
 
 # =====================================================================================
 
@@ -59,6 +66,9 @@ def initialize():
     kit.servo[0].angle = 90
     kit.servo[1].angle = 0
 
+    distance1 = measuringDistance1()
+    distance2 = measuringDistance2()
+
 def eStop():
     # turn off all moving parts and return to safe state
 
@@ -68,24 +78,53 @@ def eStop():
 #def buttonPressedEstop():
     # start the system when the button is pressed
 
-#def endStop():
+def endStop():
     # sensor measuring the end of the table
+    distance2 = measuringDistance2()
+    if distance2 < 5:
+            print("!!! END OF TABLE DETECTED — STOP !!!")
+            stopDriving()      
 
 def measuringDistance1():
         # Distance sensor initialization - sensor measuring that a plant is nearby
     # Trigger puls
-    GPIO.output(TRIG, True)
+    GPIO.output(TRIG1, True)
     time.sleep(0.00001)
-    GPIO.output(TRIG, False)
+    GPIO.output(TRIG1, False)
 
     # Wachten op echo start
     start_time = time.time()
-    while GPIO.input(ECHO) == 0:
+    while GPIO.input(ECHO1) == 0:
         start_time = time.time()
 
     # Wachten op echo einde
     stop_time = time.time()
-    while GPIO.input(ECHO) == 1:
+    while GPIO.input(ECHO1) == 1:
+        stop_time = time.time()
+
+    # Tijdsverschil
+    time_elapsed = stop_time - start_time
+
+    # Geluidssnelheid: 34300 cm/s
+    distance = (time_elapsed * 34300) / 2
+
+    return distance
+
+def measuringDistance2():
+        # Distance sensor initialization - sensor measuring that a plant is nearby
+    # Trigger puls
+    GPIO.output(TRIG2, True)
+    time.sleep(0.00001)
+    GPIO.output(TRIG2, False)
+
+    # Wachten op echo start
+    start_time = time.time()
+    while GPIO.input(ECHO2) == 0:
+        start_time = time.time()
+
+    # Wachten op echo einde
+    stop_time = time.time()
+    while GPIO.input(ECHO2) == 1:
         stop_time = time.time()
 
     # Tijdsverschil
@@ -98,14 +137,20 @@ def measuringDistance1():
 
 def plantFound():
     while True:
-        distance = measuringDistance1()
-        print(f"Distance: {distance:.1f} cm")
+ #       distance1 = measuringDistance1()
+        distance2 = measuringDistance1()
+        print(f"Distance1: {distance2:.1f}") # cm & Distanc2: {distance2:.f}")
+        #print(f"Distance: {distance2:.f}cm")
 
-        if distance < 5:
+        if distance2 < 5:
             print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
             stopDriving()
             break
 
+#        elif distance2 < 5:
+#            print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
+#            stopDriving()
+#            state = 10
         time.sleep(0.1)
 
 def startDrivingF():
@@ -194,20 +239,16 @@ while True:
             sleep(3)
             state = 20
         case 10: # Standby, wait for start command
-            if (startButtonPressed):
-                state = 20
+#            if (startButtonPressed):
+                state = 10
+        # Distance sensor initialization - sensor measuring that a plant is nearby
         case 20: # Start driving until reached a plant
             startDrivingF()
             state = 30
         case 30:
             plantFound()
-            #if measuringDistance1 < 5:
-            #    stopDriving()
             sleep(3)
             state = 40
-#            if (endStop()):
-#                stopDriving()
-#                state = 10
         case 40:
             rotateArm(0)
             sleep(3)
