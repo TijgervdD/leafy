@@ -1,5 +1,5 @@
 state = 0 # global statemachine variable
-speed = 20 # global motor speed setting
+speed = 40 # global motor speed setting
 
 # Import files
 import RPi.GPIO as GPIO
@@ -31,6 +31,8 @@ for p in motor_pins:
 pwm1 = GPIO.PWM(EN_M1, 1000)
 pwm2 = GPIO.PWM(EN_M2, 1000)
 
+#Initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
+kit = ServoKit(channels=16)
 
 # Setup voor Pi 5: CE op GPIO 25, CSN op SPI0 (CE0 / GPIO 8)
 radio = RF24(25, 0)
@@ -53,11 +55,9 @@ def initialize():
     pwm1.start(0)
     pwm2.start(0)
 
-    #Initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
-    kit = ServoKit(channels=16)
     #Desiding the initial angle that the servo which is attatched to Port 0 will be.
     kit.servo[0].angle = 90
-    kit.servo[2].angle = 0
+    kit.servo[1].angle = 0
 
 def eStop():
     # turn off all moving parts and return to safe state
@@ -65,10 +65,10 @@ def eStop():
     # go to standby
     state = 10
 
-def buttonPressedEstop()
+#def buttonPressedEstop():
     # start the system when the button is pressed
 
-def endStop():
+#def endStop():
     # sensor measuring the end of the table
 
 def measuringDistance1():
@@ -98,13 +98,13 @@ def measuringDistance1():
 
 def plantFound():
     while True:
-        Distance = measuringDistance1()
-        print(f"Afstand: {afstand:.1f} cm")
+        distance = measuringDistance1()
+        print(f"Distance: {distance:.1f} cm")
 
-#        if distance < 5:
-#            print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
-#            motors_stop()
-#            break
+        if distance < 5:
+            print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
+            stopDriving()
+            break
 
         time.sleep(0.1)
 
@@ -191,6 +191,7 @@ while True:
     match state:
         case 0:
             initialize()
+            sleep(3)
             state = 20
         case 10: # Standby, wait for start command
             if (startButtonPressed):
@@ -200,18 +201,21 @@ while True:
             state = 30
         case 30:
             plantFound()
-                if afstand <5:
-                stopDriving()
-                state = 40
-            if (endStop()):
-                stopDriving()
-                state = 10
+            #if measuringDistance1 < 5:
+            #    stopDriving()
+            sleep(3)
+            state = 40
+#            if (endStop()):
+#                stopDriving()
+#                state = 10
         case 40:
             rotateArm(0)
+            sleep(3)
             state = 50
         case 50:
             extendArm(40)
-            state = 60
+            sleep(3)
+            state = 20
         case 60:
             waterThePlant()
             state = 70
