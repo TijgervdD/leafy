@@ -54,6 +54,12 @@ GPIO.setup(ECHO1, GPIO.IN)
 GPIO.setup(TRIG2, GPIO.OUT)
 GPIO.setup(ECHO2, GPIO.IN)
 
+#relais pin / Solenoid valve
+RELAY_PIN = 16
+
+# Setup the pin in the setup section
+GPIO.setup(RELAY_PIN, GPIO.OUT)
+
 # =====================================================================================
 
 def initialize():
@@ -109,7 +115,6 @@ def measuringDistance1():
     distance1 = (time_elapsed * 34300) / 2
 
     return distance1
-
 
 def measuringDistance2():
         # Distance sensor initialization - sensor measuring that a plant is nearby
@@ -232,6 +237,18 @@ def extendArm(pos):
     # control servo to extend the arm
     kit.servo[1].angle = pos
 
+def solenoidValveOpen():
+    # If your relay is 'Active Low', use GPIO.LOW to turn it on
+    GPIO.output(RELAY_PIN, GPIO.LOW)
+    print("Valve is Open")
+
+def solenoidValveClosed():
+    # Use GPIO.HIGH to turn it off
+    GPIO.output(RELAY_PIN, GPIO.HIGH)
+    print("Valve is Closed")
+
+def wateringPlant():
+
 # =========================================================================================
 # LOOP
 while True:
@@ -246,29 +263,41 @@ while True:
         case 10: # Standby, wait for start command
 #            if (startButtonPressed):
                 state = 10
-        # Distance sensor initialization - sensor measuring that a plant is nearby
         case 20: # Start driving until reached a plant
             startDrivingF()
             state = 30
-        case 30:
+        case 30: # Driving stops because plant is reached
             plantFound()
             sleep(3)
             state = 40
-        case 40:
+        case 40: # Arm is rotated outward to Left
             rotateArm(0)
             sleep(3)
             state = 50
-        case 50:
-            extendArm(40)
+        case 50.1:
+            extendArm(40) # Arm is extended to first position
             sleep(3)
-            state = 20
-        case 60:
-            waterThePlant()
-            state = 70
-        case 80:
-            retractArm()
+            state = 70.1
+        case 50.2:
+            extendArm(40) # Arm is extended to first position
+            sleep(3)
+            state = 70.2
+        case 70.1:
+            receiveRemoteControlData() # Plant humidity value is received
+            state = 80.1
+        case 70.2:
+            receiveRemoteControlData() # Plant humidity value is received
+            state = 80.2
+        case 80.1:
+            wateringPlant() # Solenoid valve opens and water goes to plant
+            state = 50.2
+        case 80.2:
+            wateringPlant() # Solenoid valve opens and water goes to plant
             state = 90
         case 90:
+            extendArm(0) # Arm extends to next plant
+            state = 100
+        case 100:
             rotateArm(90)
             state = 20
         case 999:
