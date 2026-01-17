@@ -85,46 +85,21 @@ def endStop():
             print("!!! END OF TABLE DETECTED — STOP !!!")
             stopDriving()      
 
-def measuringDistance1():
+def measuringDistance():
         # Distance sensor initialization - sensor measuring that a plant is nearby
     # Trigger puls
-    GPIO.output(TRIG1, True)
+    GPIO.output(trig_pin, True)
     time.sleep(0.00001)
-    GPIO.output(TRIG1, False)
+    GPIO.output(trig_pin, False)
 
     # Wachten op echo start
     start_time = time.time()
-    while GPIO.input(ECHO1) == 0:
+    while GPIO.input(echo_pin) == 0:
         start_time = time.time()
 
     # Wachten op echo einde
     stop_time = time.time()
-    while GPIO.input(ECHO1) == 1:
-        stop_time = time.time()
-
-    # Tijdsverschil
-    time_elapsed = stop_time - start_time
-
-    # Geluidssnelheid: 34300 cm/s
-    distance = (time_elapsed * 34300) / 2
-
-    return distance
-
-def measuringDistance2():
-        # Distance sensor initialization - sensor measuring that a plant is nearby
-    # Trigger puls
-    GPIO.output(TRIG2, True)
-    time.sleep(0.00001)
-    GPIO.output(TRIG2, False)
-
-    # Wachten op echo start
-    start_time = time.time()
-    while GPIO.input(ECHO2) == 0:
-        start_time = time.time()
-
-    # Wachten op echo einde
-    stop_time = time.time()
-    while GPIO.input(ECHO2) == 1:
+    while GPIO.input(echo_pin) == 1:
         stop_time = time.time()
 
     # Tijdsverschil
@@ -137,20 +112,24 @@ def measuringDistance2():
 
 def plantFound():
     while True:
- #       distance1 = measuringDistance1()
-        distance2 = measuringDistance1()
-        print(f"Distance1: {distance2:.1f}") # cm & Distanc2: {distance2:.f}")
-        #print(f"Distance: {distance2:.f}cm")
+        distance1 = measure_distance(TRIG1, ECHO1)
+        distance2 = measure_distance(TRIG2, ECHO2)
+        
+        print(f"Dist 1: {distance1:.1f} cm | Dist 2: {distance2:.1f} cm")
 
-        if distance2 < 5:
-            print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
-            stopDriving()
+        # Specific check for Sensor 1
+        if distance1 < 5:
+            print("!!! PLANT DETECTED — STOPPING !!!")
+            motors_stop()
+            break
+        
+        # Specific check for Sensor 2
+        elif distance2 < 5:
+            print("!!! END OF TABLE DETECTED — STOP !!!")
+            motors_stop()
+            state = 10
             break
 
-#        elif distance2 < 5:
-#            print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
-#            stopDriving()
-#            state = 10
         time.sleep(0.1)
 
 def startDrivingF():
