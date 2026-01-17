@@ -10,16 +10,16 @@ GPIO.setmode(GPIO.BCM)
 # Motor 1
 IN1_M1 = 17
 IN2_M1 = 18
-EN_M1  = 18   # PWM voor motor 1
+EN_M1  = 23   # PWM voor motor 1
 
 # Motor 2
-IN1_M2 = 27
-IN2_M2 = 22
-EN_M2  = 13   # PWM voor motor 2
+IN1_M2 = 22
+IN2_M2 = 27
+EN_M2  = 24   # PWM voor motor 2
 
 # HC-SR04 pins
-TRIG = 20
-ECHO = 21
+TRIG = 6
+ECHO = 5
 
 # Motor pin setup
 motor_pins = [IN1_M1, IN2_M1, IN1_M2, IN2_M2, EN_M1, EN_M2]
@@ -92,13 +92,13 @@ def meet_afstand():
 
 try:
     print("Robot start automatisch vooruit te rijden.")
-    motors_forward(60)  # 60% snelheid
+    motors_forward(40)  # 60% snelheid
 
     while True:
         afstand = meet_afstand()
         print(f"Afstand: {afstand:.1f} cm")
 
-        if afstand < 10:
+        if afstand < 5:
             print("!!! OBSTAKEL GEDTECTEERD binnen 5cm — STOP !!!")
             motors_stop()
             break
