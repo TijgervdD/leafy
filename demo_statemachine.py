@@ -1,5 +1,6 @@
 state = 0 # global statemachine variable
 speed = 40 # global motor speed setting
+wateringTime = 0 # defining wateringTime
 
 # Import files
 import RPi.GPIO as GPIO
@@ -202,7 +203,7 @@ def receiveRemoteControlData():
     radio.startListening()
     radio.printDetails()
 
-def radioLoop():
+#def radioLoop():
     while True:
         if radio.available():
             # We lezen 32 bytes (zoals de Arduino char buffer)
@@ -218,16 +219,22 @@ def radioLoop():
         
         time.sleep(0.01)
 
-    if __name__ == "__main__":
-        setup()
-        try:
-            loop()
-        except KeyboardInterrupt:
-            print("\nOntvanger gestopt.")
+        if __name__ == "__main__":
+            setup()
+            try:
+                loop()
+            except KeyboardInterrupt:
+                print("\nOntvanger gestopt.")
+    #humidity = radio array
 
-def radioListen():
-        receiveRemoteControlData()
-        radioLoop()
+def wateringTiming(i):
+    receiveRemoteControlData()
+    if humidity[i] > 50
+        wateringTime = 0
+    elif humidity[i] > 40
+        wateringTime = 2
+    elif humidity[i] > 30
+        wateringTime = 4
 
 def rotateArm(pos):
     # control servo to move arm to pos
@@ -248,6 +255,9 @@ def solenoidValveClosed():
     print("Valve is Closed")
 
 def wateringPlant():
+    solenoidValveOpen
+    sleep(wateringTime)
+    solenoidValveClosed
 
 # =========================================================================================
 # LOOP
@@ -278,22 +288,12 @@ while True:
             extendArm(40) # Arm is extended to first position
             sleep(3)
             state = 70.1
-        case 50.2:
-            extendArm(40) # Arm is extended to first position
-            sleep(3)
-            state = 70.2
         case 70.1:
-            receiveRemoteControlData() # Plant humidity value is received
+            wateringTiming(1) # Plant humidity value is received
             state = 80.1
-        case 70.2:
-            receiveRemoteControlData() # Plant humidity value is received
-            state = 80.2
         case 80.1:
             wateringPlant() # Solenoid valve opens and water goes to plant
             state = 50.2
-        case 80.2:
-            wateringPlant() # Solenoid valve opens and water goes to plant
-            state = 90
         case 90:
             extendArm(0) # Arm extends to next plant
             state = 100
