@@ -57,9 +57,11 @@ GPIO.setup(ECHO2, GPIO.IN)
 
 #relais pin / Solenoid valve
 RELAY_PIN = 16
+START_BUTTON_PIN =21
 
 # Setup the pin in the setup section
 GPIO.setup(RELAY_PIN, GPIO.OUT)
+GPIO.setup(START_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # =====================================================================================
 
@@ -76,14 +78,27 @@ def initialize():
 #    distance1 = measuringDistance1()
 #    distance2 = measuringDistance2()
 
-def eStop():
+#def eStop():
     # turn off all moving parts and return to safe state
 
     # go to standby
-    state = 10
+#    state = 10
 
 #def buttonPressedEstop():
+
+def startButtonPressed():
     # start the system when the button is pressed
+    while True:
+        startButtonPressed = (GPIO.input(START_BUTTON_PIN) == GPIO.LOW)  # Button pressed
+
+        # 2. State Machine Logic
+        if state == 10:
+            print("Status: Standby. Waiting for button...")
+            if startButtonPressed:
+                print("Button pressed! Moving to State 20.")
+                state = 20
+
+        time.sleep(0.1) # Debounce/CPU relief
 
 def endStop():
     # sensor measuring the end of the table
@@ -229,12 +244,12 @@ def receiveRemoteControlData():
 
 def wateringTiming(i):
     receiveRemoteControlData()
-    if humidity[i] > 50
-        wateringTime = 0
-    elif humidity[i] > 40
-        wateringTime = 2
-    elif humidity[i] > 30
-        wateringTime = 4
+#    if humidity[i] > 50
+#        wateringTime = 0
+#    elif humidity[i] > 40
+#        wateringTime = 2
+#    elif humidity[i] > 30
+#        wateringTime = 4
 
 def rotateArm(pos):
     # control servo to move arm to pos
@@ -246,33 +261,36 @@ def extendArm(pos):
 
 def solenoidValveOpen():
     # If your relay is 'Active Low', use GPIO.LOW to turn it on
-    GPIO.output(RELAY_PIN, GPIO.LOW)
+    GPIO.output(RELAY_PIN, GPIO.HIGH)
     print("Valve is Open")
 
 def solenoidValveClosed():
     # Use GPIO.HIGH to turn it off
-    GPIO.output(RELAY_PIN, GPIO.HIGH)
+    GPIO.output(RELAY_PIN, GPIO.LOW)
     print("Valve is Closed")
 
 def wateringPlant():
     solenoidValveOpen
-    sleep(wateringTime)
+    sleep(3) #wateringTime
     solenoidValveClosed
+    sleep(3)
 
 # =========================================================================================
 # LOOP
 while True:
-    #if (buttonPressedEstop()):
-    #    eStop()
+#    if (buttonPressedEstop()):
+#        eStop()
 
     match state:
         case 0:
             initialize()
-            sleep(3)
-            state = 20
+            sleep(1)
+            state = 10
         case 10: # Standby, wait for start command
-#            if (startButtonPressed):
-                state = 10
+            print("Waiting for initialization")
+            if GPIO.input(START_BUTTON_PIN) == GPIO.LOW:  # Button pressed
+                print("Button was pressed!")
+                state = 20
         case 20: # Start driving until reached a plant
             startDrivingF()
             state = 30
@@ -284,16 +302,20 @@ while True:
             rotateArm(0)
             sleep(3)
             state = 50
-        case 50.1:
+        case 50:
             extendArm(40) # Arm is extended to first position
             sleep(3)
-            state = 70.1
-        case 70.1:
+            state = 80
+        case 50:
+            extendArm(60) # Arm is extended to first position
+            sleep(3)
+            state = 30
+        case 60:
             wateringTiming(1) # Plant humidity value is received
-            state = 80.1
-        case 80.1:
+            state = 80
+        case 80:
             wateringPlant() # Solenoid valve opens and water goes to plant
-            state = 50.2
+            state = 51
         case 90:
             extendArm(0) # Arm extends to next plant
             state = 100

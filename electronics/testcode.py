@@ -1,47 +1,21 @@
-#Here we will import all the extra functionality desired
+import RPi.GPIO as GPIO
+import time
 from time import *
-from adafruit_servokit import ServoKit
+GPIO.setmode(GPIO.BCM)
+#relais pin / Solenoid valve
+RELAY_PIN = 16
 
-state = 0 # global statemachine variable
+def solenoidValveOpen():
+    # If your relay is 'Active Low', use GPIO.LOW to turn it on
+    GPIO.output(RELAY_PIN, GPIO.HIGH)
+    print("Valve is Open")
 
-#Below is an initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
-kit = ServoKit(channels=16)
-
-def initialize():
-    #Below desides the initial angle that the servo which is attatched to Port 0 will be. In this case we will make it zero degrees.
-    kit.servo[0].angle = 90
-
-def positionArm(pos):
-    # control servo to move arm to pos from middle possition to Left
-    #Below will rotate the Standard servo to the 180 degree point
-    kit.servo[0].angle = pos
-    sleep(3)
-
-def positionArmLR():
-    # control servo to move arm to pos from left possition to right
-    kit.servo[0].angle = 180
-    sleep(3)
-
-def positionArmRM():
-    # control servo to move arm to pos from right possition to middle
-    kit.servo[0].angle = 90
-    sleep(3)
-#Below will create an infinite loop
-
+def solenoidValveClosed():
+    # Use GPIO.HIGH to turn it off
+    GPIO.output(RELAY_PIN, GPIO.LOW)
+    print("Valve is Closed")
 
 while True:
-    match state:
-        case 0:
-            initialize()
-            state = 10
-        case 10: 
-            positionArm(0)
-            state = 20
-        case 20:
-            positionArm(180)
-            state = 30
-        case 30:
-            positionArm(90)
-            state = 40
-        case 40:
-            exit()
+    solenoidValveOpen()
+    time.sleep(3)
+    solenoidValveClosed
