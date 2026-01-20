@@ -253,11 +253,14 @@ def wateringTiming(i):
 
 def rotateArm(pos):
     # control servo to move arm to pos
+    sleep(2)
     kit.servo[0].angle = pos
+    sleep(2)
 
 def extendArm(pos):
     # control servo to extend the arm
     kit.servo[1].angle = pos
+    sleep(2)
 
 def solenoidValveOpen():
     # If your relay is 'Active Low', use GPIO.LOW to turn it on
@@ -273,7 +276,6 @@ def wateringPlant():
     solenoidValveOpen
     sleep(3) #wateringTime
     solenoidValveClosed
-    sleep(3)
 
 # =========================================================================================
 # LOOP
@@ -303,23 +305,29 @@ while True:
             sleep(3)
             state = 50
         case 50:
-            extendArm(40) # Arm is extended to first position
+            extendArm(80) # Arm is extended to first position
             sleep(3)
-            state = 80
-        case 50:
-            extendArm(60) # Arm is extended to first position
-            sleep(3)
-            state = 30
+            state = 70
         case 60:
             wateringTiming(1) # Plant humidity value is received
-            state = 80
-        case 80:
+            state = 70
+        case 70:
             wateringPlant() # Solenoid valve opens and water goes to plant
             state = 51
+        case 51:
+            extendArm(160) # Arm is extended to first position
+            sleep(3)
+            state = 71
+        case 61:
+            wateringTiming(1) # Plant humidity value is received
+            state = 80
+        case 71:
+            wateringPlant() # Solenoid valve opens and water goes to plant
+            state = 80
+        case 80:
+            extendArm(0) # Arm Retract
+            state = 90
         case 90:
-            extendArm(0) # Arm extends to next plant
-            state = 100
-        case 100:
             rotateArm(90)
             state = 20
         case 999:
