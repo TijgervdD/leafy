@@ -18,8 +18,8 @@ SOIL_HUMIDITY = 40.0  # %
 # ------------------------------------------------------------
 # HSV DEFINITIONS
 # ------------------------------------------------------------
-GREEN_LOWER = np.array([21, 26, 26])
-GREEN_UPPER = np.array([95, 255, 255])
+GREEN_LOWER = np.array([46, 53, 53])
+GREEN_UPPER = np.array([70, 255, 255])
 
 # ------------------------------------------------------------
 # WATER FORMULA
@@ -143,10 +143,10 @@ def analyze_plant(image_rgb):
 # MAIN
 # ------------------------------------------------------------
 if __name__ == "__main__":
-    print("📷 Capturing image...")
+    print("Capturing image...")
     image = capture_frame()
 
-    print("🌱 Analyzing plant (full filtering)...")
+    print("Analyzing plant (full filtering)...")
     (
         green_ratio,
         green_mask,
@@ -200,3 +200,5 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.show()
+
+
