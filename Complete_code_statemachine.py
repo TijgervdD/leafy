@@ -1,6 +1,7 @@
 state = 0 # global statemachine variable
 speed = 40 # global motor speed setting
-wateringTime = 0 # defining wateringTime
+wateringTime = 0 # defining start value wateringTime
+humidity = 0 #define start value humidity
 
 # Import files
 import RPi.GPIO as GPIO
@@ -58,10 +59,12 @@ GPIO.setup(ECHO2, GPIO.IN)
 #relais pin / Solenoid valve
 RELAY_PIN = 16
 START_BUTTON_PIN =21
+STOP_BUTTON_PIN =22
 
 # Setup the pin in the setup section
 GPIO.setup(RELAY_PIN, GPIO.OUT)
 GPIO.setup(START_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(STOP_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # =====================================================================================
 
@@ -75,84 +78,60 @@ def initialize():
     kit.servo[0].angle = 90
     kit.servo[1].angle = 0
 
-#    distance1 = measuringDistance1()
-#    distance2 = measuringDistance2()
-
-#def eStop():
-    # turn off all moving parts and return to safe state
-
-    # go to standby
-#    state = 10
-
-#def buttonPressedEstop():
-
-def startButtonPressed():
-    # start the system when the button is pressed
-    while True:
-        startButtonPressed = (GPIO.input(START_BUTTON_PIN) == GPIO.LOW)  # Button pressed
-
-        # 2. State Machine Logic
-        if state == 10:
-            print("Status: Standby. Waiting for button...")
-            if startButtonPressed:
-                print("Button pressed! Moving to State 20.")
-                state = 20
-
-        time.sleep(0.1) # Debounce/CPU relief
-
-def endStop():
-    # sensor measuring the end of the table
-    distance2 = measuringDistance()
-    if distance2 < 5:
-            print("!!! END OF TABLE DETECTED — STOP !!!")
-            stopDriving()      
+def eStop():
+    #turn off all moving parts and return to safe state
+    stopDriving() #stop driving
+    extendArm(0) #retract arm
+    rotateArm(90) #move arm into body
+     #go to standby
+    state = 10
 
 def measuringDistance1():
-        # Distance sensor initialization - sensor measuring that a plant is nearby
+    # Distance sensor initialization - sensor measuring that a plant is nearby
     # Trigger puls
     GPIO.output(TRIG1, True)
     time.sleep(0.00001)
     GPIO.output(TRIG1, False)
 
-    # Wachten op echo start
+    # Waiting on echo start
     start_time = time.time()
     while GPIO.input(ECHO1) == 0:
         start_time = time.time()
 
-    # Wachten op echo einde
+    # Waiting on echo einde
     stop_time = time.time()
     while GPIO.input(ECHO1) == 1:
         stop_time = time.time()
 
-    # Tijdsverschil
+    # Time difference
     time_elapsed = stop_time - start_time
 
-    # Geluidssnelheid: 34300 cm/s
+    # Speed of sound: 34300 cm/s
     distance1 = (time_elapsed * 34300) / 2
 
     return distance1
 
 def measuringDistance2():
-        # Distance sensor initialization - sensor measuring that a plant is nearby
+    # Distance sensor initialization - sensor measuring that a plant is nearby
     # Trigger puls
     GPIO.output(TRIG2, True)
     time.sleep(0.00001)
     GPIO.output(TRIG2, False)
 
-    # Wachten op echo start
+    # Waiting on echo start
     start_time = time.time()
     while GPIO.input(ECHO2) == 0:
         start_time = time.time()
 
-    # Wachten op echo einde
+    # Waiting on echo einde
     stop_time = time.time()
     while GPIO.input(ECHO2) == 1:
         stop_time = time.time()
 
-    # Tijdsverschil
+    # Time difference
     time_elapsed = stop_time - start_time
 
-    # Geluidssnelheid: 34300 cm/s
+    # Speed of sound: 34300 cm/s
     distance2 = (time_elapsed * 34300) / 2
 
     return distance2
@@ -210,15 +189,14 @@ def stopDriving():
 
 def receiveRemoteControlData():
     # handle nrf24l data reception
-    radio.begin() # Slower air speed is more stable
-    radio.setDataRate(RF24_250KBPS)
-    #  radio.setPALevel(RF24_PA_MIN)
+    radio.begin() 
+    radio.setDataRate(RF24_250KBPS) # Slower air speed is more stable
     radio.openReadingPipe(1, address)
     radio.setPALevel(RF24_PA_MIN)
     radio.startListening()
     radio.printDetails()
 
-#def radioLoop():
+def radioLoop():
     while True:
         if radio.available():
             # We lezen 32 bytes (zoals de Arduino char buffer)
@@ -240,16 +218,16 @@ def receiveRemoteControlData():
                 loop()
             except KeyboardInterrupt:
                 print("\nOntvanger gestopt.")
-    #humidity = radio array
+humidity = radio array
 
 def wateringTiming(i):
     receiveRemoteControlData()
-#    if humidity[i] > 50
-#        wateringTime = 0
-#    elif humidity[i] > 40
-#        wateringTime = 2
-#    elif humidity[i] > 30
-#        wateringTime = 4
+    if humidity[i] > 50:
+        wateringTime = 0
+    elif humidity[i] > 40:
+        wateringTime = 2
+    elif humidity[i] > 30:
+        wateringTime = 4
 
 def rotateArm(pos):
     # control servo to move arm to pos
@@ -274,14 +252,15 @@ def solenoidValveClosed():
 
 def wateringPlant():
     solenoidValveOpen
-    sleep(3) #wateringTime
+    sleep(wateringTime) #wateringTime
     solenoidValveClosed
 
 # =========================================================================================
 # LOOP
 while True:
-#    if (buttonPressedEstop()):
-#        eStop()
+    if GPIO.input(STOP_BUTTON_PIN) == GPIO.LOW:  # Button pressed
+        print("Emergency STOP button was pressed!")
+        eStop()
 
     match state:
         case 0:
@@ -319,7 +298,7 @@ while True:
             sleep(3)
             state = 71
         case 61:
-            wateringTiming(1) # Plant humidity value is received
+            wateringTiming(2) # Plant humidity value is received
             state = 80
         case 71:
             wateringPlant() # Solenoid valve opens and water goes to plant
