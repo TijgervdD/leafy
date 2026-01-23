@@ -6,7 +6,7 @@ from pyrf24 import RF24, RF24_PA_MIN
 radio = RF24(25, 0)
 
 # Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal)
-address = b"0001\x00" 
+address = b"4567\x00" 
 
 #def setup():
 
@@ -16,8 +16,8 @@ def setup():
         print("FOUT: nRF24L01 niet gevonden!")
         sys.exit()
 
-    # Lower the data rate to make it more resistant to noise
  #   radio.setDataRate(RF24_250KBPS) 
+    # Lower the data rate to make it more resistant to nois
   #  radio.setPALevel(RF24_PA_MIN)
     
     # ... rest of your setup
@@ -26,7 +26,9 @@ def setup():
  #       sys.exit()
 
     # We openen pipe 1 om te luisteren naar het adres van de zender
-    radio.openReadingPipe(1, address)
+   # radio.openReadingPipe(1, address)
+    radio.openReadingPipe(1,address)
+
     radio.setPALevel(RF24_PA_MIN)
     
     # Optioneel: zorg dat de datasnelheid gelijk is (standaard 1Mbps)
