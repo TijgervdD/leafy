@@ -1,5 +1,5 @@
 state = 0 # global statemachine variable
-speed = 60# global motor speed setting
+speed = 80# global motor speed setting
 wateringTime = 0 # defining start value wateringTime
 humidity = 0 #define start value humidity
 
@@ -16,7 +16,7 @@ GPIO.setmode(GPIO.BCM)
 # ==============================================================================
 # PIN layout and initial setup
 # Motor 1
-IN1_M1 = 24#17
+IN1_M1 = 23#17
 IN2_M1 = 22#18
 EN_M1  = 24#23   # PWM voor motor 1
 

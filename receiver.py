@@ -8,7 +8,7 @@ radio = RF24(25, 0)
 
 
 # Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal) 
-address = b"4544x00" 
+address = b"4570x00" 
 
 humidi = 0
 
