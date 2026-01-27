@@ -1,5 +1,5 @@
 state = 0 # global statemachine variable
-speed = 40 # global motor speed setting
+speed = 60# global motor speed setting
 wateringTime = 0 # defining start value wateringTime
 humidity = 0 #define start value humidity
 
@@ -43,8 +43,8 @@ radio = RF24(25, 0)
 address = b"0001\x00" 
 
 # HC-SR04 pins (sonar sensor)
-TRIG1 = 6
-ECHO1 = 5
+TRIG1 = 5
+ECHO1 = 6
 
 TRIG2 = 12
 ECHO2 =13
@@ -57,9 +57,9 @@ GPIO.setup(TRIG2, GPIO.OUT)
 GPIO.setup(ECHO2, GPIO.IN)
 
 #relais pin / Solenoid valve
-RELAY_PIN = 16
-START_BUTTON_PIN =21
-STOP_BUTTON_PIN =22
+RELAY_PIN = 21
+START_BUTTON_PIN =20
+STOP_BUTTON_PIN = 19
 
 # Setup the pin in the setup section
 GPIO.setup(RELAY_PIN, GPIO.OUT)
@@ -218,7 +218,7 @@ def radioLoop():
                 loop()
             except KeyboardInterrupt:
                 print("\nOntvanger gestopt.")
-humidity = radio array
+#humidity = radio.array
 
 def wateringTiming(i):
     receiveRemoteControlData()
