@@ -28,6 +28,26 @@ def predict_water(humidity, greenery):
     return 261.83 - humidity * 3.13314695 + greenery * 2.13997997
 
 # ------------------------------------------------------------
+# VALVE TIME CALCULATION
+# ------------------------------------------------------------
+def valve_open_time_ml(V_ml):
+    """
+    Calculate how long the solenoid valve should open for a target volume V_ml.
+    Returns time in seconds. Returns None if V_ml is out of valid range.
+    """
+    a = 0.11455309
+    b = 36.75567689
+    c = 19.817595 - V_ml
+
+    discriminant = b**2 - 4*a*c
+    if discriminant < 0:
+        # Volume outside calibrated range
+        return None
+
+    t = (-b + np.sqrt(discriminant)) / (2*a)
+    return t
+
+# ------------------------------------------------------------
 # FILTERING FUNCTIONS (UNCHANGED)
 # ------------------------------------------------------------
 def is_valid_pixel(y, x, mask, radius=3, threshold=0.75):
@@ -156,6 +176,7 @@ if __name__ == "__main__":
     ) = analyze_plant(image)
 
     water = predict_water(SOIL_HUMIDITY, green_ratio)
+    valve_time = valve_open_time_ml(water)
 
     print("\n--- RESULTS ---")
     print(f"Soil humidity: {SOIL_HUMIDITY:.1f}%")
@@ -163,7 +184,11 @@ if __name__ == "__main__":
     print(f"Top pixel: {top_pixel}")
     print(f"Bottom pixel: {bottom_pixel}")
     print(f"Plant height (px): {plant_height}")
-    print(f"Predicted water: {water:.2f}")
+    print(f"Predicted water: {water:.2f} ml")
+    if valve_time is not None:
+        print(f"Valve should open for: {valve_time:.2f} s")
+    else:
+        print("Predicted water is out of the calibrated range!")
 
     # --------------------------------------------------------
     # VISUALIZATION
@@ -174,13 +199,17 @@ if __name__ == "__main__":
 
     h, w, _ = image.shape
     if top_pixel is not None:
-        cv2.line(overlay, (int(0.15 * w), top_pixel), (int(0.85 * w), top_pixel), (255, 0, 0), 2)
+        cv2.line(
+            overlay, (int(0.15 * w), top_pixel), (int(0.85 * w), top_pixel), (255, 0, 0), 2
+        )
     if bottom_pixel is not None:
-        cv2.line(overlay, (int(0.15 * w), bottom_pixel), (int(0.85 * w), bottom_pixel), (255, 0, 0), 2)
+        cv2.line(
+            overlay, (int(0.15 * w), bottom_pixel), (int(0.85 * w), bottom_pixel), (255, 0, 0), 2
+        )
 
     plt.figure(figsize=(12, 4))
     plt.suptitle(
-        f"Green {green_ratio:.2f}% | Height {plant_height}px | Water {water:.2f}"
+        f"Green {green_ratio:.2f}% | Height {plant_height}px | Water {water:.2f} ml | Valve {valve_time:.2f} s"
     )
 
     plt.subplot(1, 3, 1)
@@ -200,5 +229,3 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.show()
-
-
