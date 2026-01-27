@@ -1,19 +1,21 @@
 import RPi.GPIO as GPIO
 import time
-
+from time import *
 GPIO.setmode(GPIO.BCM)
+#relais pin / Solenoid valve
+RELAY_PIN = 16
 
-# Relay 1
-GPIO.setup(21, GPIO.OUT)
+def solenoidValveOpen():
+    # If your relay is 'Active Low', use GPIO.LOW to turn it on
+    GPIO.output(RELAY_PIN, GPIO.HIGH)
+    print("Valve is Open")
 
-try:
-    while True:
-        GPIO.output(21, GPIO.HIGH)
-        print('Relay 1 ON')
-        time.sleep(1)
-        GPIO.output(21, GPIO.LOW)
-        print('Relay 1 OFF')
-        time.sleep(1)
-        
-finally:
-    GPIO.cleanup()
+def solenoidValveClosed():
+    # Use GPIO.HIGH to turn it off
+    GPIO.output(RELAY_PIN, GPIO.LOW)
+    print("Valve is Closed")
+
+while True:
+    solenoidValveOpen()
+    time.sleep(3)
+    solenoidValveClosed
