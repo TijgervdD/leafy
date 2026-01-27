@@ -184,8 +184,8 @@ def stopDriving():
 # ============================================================
 def read_remote_humidity():
     """
-    Updates the global humidity list with data from the NRF24 receiver
-    Expected format: "45.3,42.1" etc.
+    Updates the global humidity list with data from the NRF24 receiver.
+    Works with a single numeric byte (like the working code) or a string.
     """
     global humidity
     radio.begin()
@@ -193,16 +193,22 @@ def read_remote_humidity():
     radio.openReadingPipe(1, address)
     radio.setPALevel(RF24_PA_MIN)
     radio.startListening()
+
     if radio.available():
         payload = radio.read(32)
         try:
             text = payload.decode("utf-8").rstrip("\x00")
-            if text:
-                print(f"Received remote data: {text}")
+            if text:  # if the hub sends a CSV string
                 parts = text.split(",")
                 humidity = [float(p) for p in parts]
+            else:  # if the hub sends a single byte
+                humidity = [payload[0]]
+            print(f"Humidity updated: {humidity}")
         except:
-            print(f"Non-text data received: {payload}")
+            # fallback if decoding fails
+            humidity = [payload[0]]
+            print(f"Humidity updated (non-text): {humidity}")
+
 
 # ============================================================
 # ARM AND VALVE FUNCTIONS
