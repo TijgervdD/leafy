@@ -59,7 +59,7 @@ GPIO.setup(ECHO2, GPIO.IN)
 #relais pin / Solenoid valve
 RELAY_PIN = 21
 START_BUTTON_PIN =20
-STOP_BUTTON_PIN = 19
+STOP_BUTTON_PIN = 16
 
 # Setup the pin in the setup section
 GPIO.setup(RELAY_PIN, GPIO.OUT)
