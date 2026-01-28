@@ -1,6 +1,6 @@
 state = 0 # global statemachine variable
 speed = 80# global motor speed setting
-wateringTime = 0 # defining start value wateringTime
+wateringTime = 1 # defining start value wateringTime
 humidity = 0 #define start value humidity
 
 # Import files
@@ -29,6 +29,7 @@ EN_M2  = 17#24   # PWM voor motor 2
 motor_pins = [IN1_M1, IN2_M1, EN_M1, IN1_M2, IN2_M2, EN_M2]
 for p in motor_pins:
     GPIO.setup(p, GPIO.OUT)
+
 # PWM op beide motoren
 pwm1 = GPIO.PWM(EN_M1, 1000)
 pwm2 = GPIO.PWM(EN_M2, 1000)
@@ -236,14 +237,11 @@ def wateringTiming(i):
 
 def rotateArm(pos):
     # control servo to move arm to pos
-    sleep(2)
     kit.servo[0].angle = pos
-    sleep(2)
 
 def extendArm(pos):
     # control servo to extend the arm
     kit.servo[1].angle = pos
-    sleep(2)
 
 def solenoidValveOpen():
     # If your relay is 'Active Low', use GPIO.LOW to turn it on
@@ -256,9 +254,10 @@ def solenoidValveClosed():
     print("Valve is Closed")
 
 def wateringPlant():
-    solenoidValveOpen
+    solenoidValveOpen()
     sleep(wateringTime) #wateringTime
-    solenoidValveClosed
+    print(f"Watering time: {wateringTime}")
+    solenoidValveClosed()
 
 # =========================================================================================
 # LOOP
@@ -289,7 +288,7 @@ while True:
             sleep(3)
             state = 50
         case 50:
-            extendArm(80) # Arm is extended to first position
+            extendArm(40) # Arm is extended to first position
             sleep(3)
             state = 70
         case 60:
@@ -299,7 +298,7 @@ while True:
             wateringPlant() # Solenoid valve opens and water goes to plant
             state = 51
         case 51:
-            extendArm(160) # Arm is extended to first position
+            extendArm(80) # Arm is extended to first position
             sleep(3)
             state = 71
         case 61:
