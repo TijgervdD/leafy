@@ -73,13 +73,13 @@ def radioLoop():
     #except KeyboardInterrupt:
      #   print("\nOntvanger gestopt.")
 
-def wateringTiming(i):
+def wateringTiming():
     radioLoop()
-    if humidi[i] > 50:
+    if humidi > 50:
         wateringTime = 0
-    elif humidi[i] > 40:
+    elif humidi > 40:
         wateringTime = 2
-    elif humidi[i] > 30:
+    elif humidi > 30:
         wateringTime = 4
 
 

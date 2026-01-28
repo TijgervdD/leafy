@@ -1,6 +1,6 @@
 import sys
 import time
-from pyrf24 import RF24, RF24_PA_MIN
+from pyrf24 import RF24, RF24_PA_MIN, RF24_PA_MIN
 
 # Setup voor Pi 5: CE op GPIO 25, CSN op SPI0 (CE0 / GPIO 8)
 radio = RF24(25, 0)
@@ -8,7 +8,7 @@ radio = RF24(25, 0)
 
 
 # Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal) 
-address = b"4570x00" 
+address = b"8434x00" 
 
 humidi = 0
 
