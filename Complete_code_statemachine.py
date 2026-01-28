@@ -263,9 +263,9 @@ def wateringPlant():
 # =========================================================================================
 # LOOP
 while True:
-    if GPIO.input(STOP_BUTTON_PIN) == GPIO.LOW:  # Button pressed
-        print("Emergency STOP button was pressed!")
-        eStop()
+    #if GPIO.input(STOP_BUTTON_PIN) == GPIO.LOW:  # Button pressed
+    #    print("Emergency STOP button was pressed!")
+    #    eStop()
 
     match state:
         case 0:
