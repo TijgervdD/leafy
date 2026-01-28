@@ -1,30 +1,43 @@
-"""
-This Raspberry Pi code was developed by newbiely.com
-This Raspberry Pi code is made available for public use without any restriction
-For comprehensive instructions and wiring diagrams, please visit:
-https://newbiely.com/tutorials/raspberry-pi/raspberry-pi-lcd
-"""
-
-
-import lcddriver
-from time import sleep
-
-# I2C address 0x27, 16 column and 2 rows
-LCD = lcddriver.lcd()
-
-def display_message(line1, line2, duration):
-    LCD.lcd_clear()
-    LCD.lcd_display_string(line1, 1)
-    LCD.lcd_display_string(line2, 2)
-    sleep(duration)
-
-try:
-    while True:
-        display_message("Newbiely", "newbiely.com", 2)
-        display_message("DIYables", "www.diyables.io", 2)
-
-except KeyboardInterrupt:
-    pass
-
-finally:
-    LCD.lcd_clear()
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+"""Simple test for I2C RGB character LCD shield kit"""
+import time
+import board
+import adafruit_character_lcd.character_lcd_rgb_i2c as character_lcd
+# Modify this if you have a different sized Character LCD
+lcd_columns = 16
+lcd_rows = 2
+# Initialise I2C bus.
+i2c = board.I2C() # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C() # For using the built-in STEMMA QT connector on a
+microcontroller
+# Initialise the LCD class
+lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows)
+lcd.clear()
+# Set LCD color to red
+lcd.color = [100, 0, 0]
+time.sleep(1)
+# Print two line message
+lcd.message = "Hello\nCircuitPython"
+# Wait 5s
+time.sleep(5)
+# Set LCD color to blue
+lcd.color = [0, 100, 0]
+time.sleep(1)
+# Set LCD color to green
+lcd.color = [0, 0, 100]
+time.sleep(1)
+# Set LCD color to purple
+lcd.color = [50, 0, 50]
+time.sleep(1)
+lcd.clear()
+# Print two line message right to left
+lcd.text_direction = lcd.RIGHT_TO_LEFT
+lcd.message = "Hello\nCircuitPython"
+# Wait 5s
+time.sleep(5)
+# Return text direction to left to right
+lcd.text_direction = lcd.LEFT_TO_RIGHT
+# Display cursor
+lcd.clear()
+lcd.cursor = True
