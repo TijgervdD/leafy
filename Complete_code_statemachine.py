@@ -80,14 +80,22 @@ def initialize():
     kit.servo[1].angle = 0
     
     GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, 
-                      callback=eStop, 
+                      callback=emergency_stop_callback, 
                       bouncetime=200)
+
+def emergency_stop_callback(channel):
+    print("!!! EMERGENCY STOP TRIGGERED !!!")
+    eStop()      # Call your existing stop function
+    sys.exit(0)  # Kill the program immediately
+    state = 10
 
 def eStop():
     #turn off all moving parts and return to safe state
     print("Emergency STOP button was pressed!")
     stopDriving() #stop driving
+    sleep(1)
     extendArm(0) #retract arm
+    sleep(1)
     rotateArm(90) #move arm into body
      #go to standby
     state = 10
@@ -238,11 +246,15 @@ def wateringTiming(i):
 def rotateArm(pos):
     # control servo to move arm to pos
     kit.servo[0].angle = pos
-
+############################################################
 def extendArm(pos):
     # control servo to extend the arm
     kit.servo[1].angle = pos
 
+
+
+
+#################################################################
 def solenoidValveOpen():
     # If your relay is 'Active Low', use GPIO.LOW to turn it on
     GPIO.output(RELAY_PIN, GPIO.HIGH)
@@ -281,15 +293,14 @@ while True:
             state = 30
         case 30: # Driving stops because plant is reached
             plantFound()
-            sleep(3)
+            sleep(2)
             state = 40
         case 40: # Arm is rotated outward to Left
             rotateArm(0)
-            sleep(3)
+            sleep(2)
             state = 50
         case 50:
-            extendArm(40) # Arm is extended to first position
-            sleep(3)
+            extendArm(60) # Arm is extended to first position
             state = 70
         case 60:
             wateringTiming(1) # Plant humidity value is received
@@ -298,8 +309,8 @@ while True:
             wateringPlant() # Solenoid valve opens and water goes to plant
             state = 51
         case 51:
-            extendArm(80) # Arm is extended to first position
-            sleep(3)
+            extendArm(120) # Arm is extended to first position
+            sleep(2)
             state = 71
         case 61:
             wateringTiming(2) # Plant humidity value is received
@@ -308,10 +319,12 @@ while True:
             wateringPlant() # Solenoid valve opens and water goes to plant
             state = 80
         case 80:
-            extendArm(0) # Arm Retract
+            extendArm(0) # Arm Retracts
+            sleep(2)
             state = 90
         case 90:
             rotateArm(90)
+            sleep(2)
             state = 20
         case 999:
             exit()

@@ -1,36 +1,39 @@
-# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
-# SPDX-License-Identifier: MIT
-"""Simple test for I2C RGB character LCD shield kit"""
 import time
 import board
-import adafruit_character_lcd.character_lcd_rgb_i2c as character_lcd
-# Modify this if you have a different sized Character LCD
-lcd_columns = 16
-lcd_rows = 2
-# Initialise I2C bus.
-i2c = board.I2C() # uses board.SCL and board.SDA
-# i2c = board.STEMMA_I2C() # For using the built-in STEMMA QT connector on a microcontroller
-# Initialise the LCD class
-lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows, address=0x27)
-#lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows)
-lcd.clear()
-# Set LCD color to red
+import busio
+import adafruit_character_lcd.character_lcd_i2c as character_lcd
 
-time.sleep(1)
-# Print two line message
-lcd.message = "Hello\nCircuitPython"
-# Wait 5s
-time.sleep(5)
-# Set LCD color to blue
-time.sleep(1)
+# 1. Use the absolute slowest stable I2C speed (10kHz)
+i2c = busio.I2C(board.SCL, board.SDA, frequency=10000)
+
+# 2. Initialize
+lcd = character_lcd.Character_LCD_I2C(i2c, 16, 2, address=0x27)
+
+# 3. Setup initial state
+lcd.backlight = True
 lcd.clear()
-# Print two line message right to left
-lcd.text_direction = lcd.RIGHT_TO_LEFT
-lcd.message = "Hello\nCircuitPython"
-# Wait 5s
-time.sleep(5)
-# Return text direction to left to right
-lcd.text_direction = lcd.LEFT_TO_RIGHT
-# Display cursor
-lcd.clear()
-lcd.cursor = True
+time.sleep(0.1) # Give it a moment to breathe
+
+def safe_print(line1, line2):
+    """
+    Overwrites the screen without using lcd.clear() 
+    to prevent the reset flicker.
+    """
+    # Pad strings to 16 characters to 'clear' old text
+    l1 = "{:<16}".format(line1[:16])
+    l2 = "{:<16}".format(line2[:16])
+    
+    # Send message as one block
+    lcd.message = f"{l1}\n{l2}"
+
+# --- RUN THE TEST ---
+print("Running Flicker-Free Test...")
+
+try:
+    while True:
+        safe_print("SYSTEM: STABLE", "VOLTAGE: GOOD")
+        time.sleep(2)
+        safe_print("NO CLEAR CMD", "USED HERE")
+        time.sleep(2)
+except Exception as e:
+    print(f"Error: {e}")
