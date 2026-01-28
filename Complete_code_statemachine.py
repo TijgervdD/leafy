@@ -77,9 +77,14 @@ def initialize():
     #Desiding the initial angle that the servo which is attatched to Port 0 will be.
     kit.servo[0].angle = 90
     kit.servo[1].angle = 0
+    
+    GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, 
+                      callback=eStop, 
+                      bouncetime=200)
 
 def eStop():
     #turn off all moving parts and return to safe state
+    print("Emergency STOP button was pressed!")
     stopDriving() #stop driving
     extendArm(0) #retract arm
     rotateArm(90) #move arm into body
