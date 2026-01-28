@@ -1,0 +1,41 @@
+
+
+Reinstall Raspberry Pi software via PI imager
+making sure SPI & I2C are active: 
+sudo raspi-config (-> P3; interface options) 
+activate: SPI & I2C sudo reboot
+Update all software: 
+sudo apt update 
+sudo apt upgrade 
+sudo apt install python3-venv python3-pip python3-smbus i2c-tools python3-dev build-essential
+Make a direction where all the needed packages will be installed: 
+mkdir ~/testing 
+cd ~/testing
+python3 -m venv env
+source env/bin/activate
+Install all the packages:
+python3 -m pip install spidev
+pip install pygame
+pip install pyrf24
+sudo apt install python3-rpi-lgpio
+sudo apt install build-essential python3-dev swig liblgpio-dev
+(in env) pip install rpi-lgpio
+
+pip install --no-deps adafruit-blinka adafruit-platformdetect adafruit-pureio
+
+
+pip install --no-deps adafruit-circuitpython-servokit \
+  adafruit-circuitpython-pca9685 \
+  adafruit-circuitpython-motor \
+  adafruit-circuitpython-busdevice \
+  adafruit-circuitpython-register \
+  Adafruit-circuitpython-typing
+pip install typing-extensions --no-deps
+
+Connecting GitHub: 
+sudo apt install -y gh
+gh auth login 
+Go to git website (via command screen) and log in to get the code 
+Fill in the code in the command screen and then 
+git clone https://github.com/TijgervdD/leafy.git
+Note: because it is a raspberry pi 5 the adafruit servomotor HAT software hass to be downloaded through such a way, otherwise you get a GPIO error. This is because of the software differences between pi 5 and younger Pi’s
