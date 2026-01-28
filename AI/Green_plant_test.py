@@ -185,9 +185,9 @@ for img_path in image_paths:
         line_end_x = int(0.85 * w)
 
         if top_pixel is not None:
-            cv2.line(overlay, (line_start_x, top_pixel), (line_end_x, top_pixel), (255, 0, 0), 2)
+            cv2.line(overlay, (line_start_x, top_pixel), (line_end_x, top_pixel), (135, 206, 235), 5)
         if bottom_pixel is not None:
-            cv2.line(overlay, (line_start_x, bottom_pixel), (line_end_x, bottom_pixel), (255, 0, 0), 2)
+            cv2.line(overlay, (line_start_x, bottom_pixel), (line_end_x, bottom_pixel), (135, 206, 235), 5)
 
         plt.figure(figsize=(12, 4))
         plt.suptitle(file_name)
