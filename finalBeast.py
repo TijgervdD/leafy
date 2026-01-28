@@ -1,7 +1,7 @@
 #Final beast
 state = 0  # global statemachine variable
 speed = 80  # global motor speed setting
-wateringTime = 1  # defining start value wateringTime
+wateringTime = 2  # defining start value wateringTime
 humidity = 0  # define start value humidity
 
 # Import files
@@ -76,7 +76,7 @@ GPIO.setup(STOP_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # =====================================================================================
 
 def initialize():
-    global current_extend_angle
+    global current_extend_angle, current_rotate_angle
 
     # initialize the system
     # initializing the start speed of the DC motors
@@ -84,9 +84,13 @@ def initialize():
     pwm2.start(0)
 
     # Deciding the initial angle that the servos will be
+    sleep(2)
     kit.servo[0].angle = 90   # rotate servo
-    kit.servo[1].angle = 0    # extend servo
+    sleep(2)
+    kit.servo[1].angle = 0   # extend servo
+
     current_extend_angle = 0  # keep software in sync
+    current_rotate_angle = 90  # keep software in sync
 
 emergency_triggered = False
 
@@ -99,7 +103,7 @@ def eStop(channel=None):
     
     # Physical stop actions
     stopDriving()
-    sleep(1)
+    sleep(2)
     extendArm(0)
     #rotateArm(90)
     
@@ -113,15 +117,6 @@ GPIO.add_event_detect(
         callback=eStop,
         bouncetime=200
     )
-
-#def eStop(channel=None):
-    # turn off all moving parts and return to safe state
-#    global state
-#    print("Emergency STOP button was pressed!")
-#    stopDriving()       # stop driving
-#    extendArm(0)        # retract arm slowly
-#    rotateArm(90)       # move arm into body
-#    state = 10          # go to standby
 
 def measuringDistance1():
     # Distance sensor initialization - sensor measuring that a plant is nearby
@@ -268,16 +263,16 @@ def wateringTiming(i):
     elif humidity[i] > 30:
         wateringTime = 4
 
-def rotateArm(target_angle, step=1, delay=0.02):
+def rotateArm(target_angle, step=1, delay=0.1):
     """
     Slowly extend/retract the arm on servo[1].
     Moves from current_extend_angle to target_angle in small steps.
     step  = degrees per step (smaller = smoother/slower)
     delay = seconds between steps (larger = slower)
     """
-    global current_extend_angle
+    global current_rotate_angle
 
-    start = int(current_extend_angle)
+    start = int(current_rotate_angle)
     end = int(target_angle)
 
     if end > start:
@@ -289,7 +284,7 @@ def rotateArm(target_angle, step=1, delay=0.02):
         kit.servo[0].angle = angle
         time.sleep(delay)
 
-    current_extend_angle = target_angle
+    current_rotate_angle = target_angle
 
     # control servo to move arm to pos (instant move)
     #kit.servo[0].angle = pos
@@ -328,10 +323,12 @@ def solenoidValveClosed():
     print("Valve is Closed")
 
 def wateringPlant():
+    sleep(1)
     solenoidValveOpen()
     sleep(wateringTime)  # wateringTime
     print(f"Watering time: {wateringTime}")
     solenoidValveClosed()
+    sleep(1)
 
 # =========================================================================================
 # LOOP
@@ -369,10 +366,10 @@ while True:
         case 50:
             extendArm(160)  # Arm is extended to first position (slowly)
             sleep(3)
-            state = 70
+            state = 60
 
         case 60:
-            wateringTiming(1)  # Plant humidity value is received
+            #wateringTiming(1)  # Plant humidity value is received
             state = 70
 
         case 70:
@@ -384,10 +381,6 @@ while True:
             sleep(3)
             state = 71
 
-        case 61:
-            wateringTiming(2)  # Plant humidity value is received
-            state = 80
-
         case 71:
             wateringPlant()  # Solenoid valve opens and water goes to plant
             state = 80
@@ -398,7 +391,7 @@ while True:
 
         case 90:
             rotateArm(90)
-            state = 20
+            state = 30
 
         case 999:
             exit()
