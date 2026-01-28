@@ -1,7 +1,8 @@
-state = 0 # global statemachine variable
-speed = 80# global motor speed setting
-wateringTime = 1 # defining start value wateringTime
-humidity = 0 #define start value humidity
+#Final beast
+state = 0  # global statemachine variable
+speed = 80  # global motor speed setting
+wateringTime = 1  # defining start value wateringTime
+humidity = 0  # define start value humidity
 
 # Import files
 import RPi.GPIO as GPIO
@@ -11,19 +12,21 @@ from adafruit_servokit import ServoKit
 import sys
 import time
 from pyrf24 import RF24, RF24_PA_MIN
+import os
+
 GPIO.setmode(GPIO.BCM)
 
 # ==============================================================================
 # PIN layout and initial setup
 # Motor 1
-IN1_M1 = 23#17
-IN2_M1 = 22#18
-EN_M1  = 24#23   # PWM voor motor 1
+IN1_M1 = 23  # 17
+IN2_M1 = 22  # 18
+EN_M1 = 24   # PWM voor motor 1
 
 # Motor 2
-IN1_M2 = 27#22
-IN2_M2 = 18#27
-EN_M2  = 17#24   # PWM voor motor 2
+IN1_M2 = 27  # 22
+IN2_M2 = 18  # 27
+EN_M2 = 17   # PWM voor motor 2
 
 # Setup pins
 motor_pins = [IN1_M1, IN2_M1, EN_M1, IN1_M2, IN2_M2, EN_M2]
@@ -34,21 +37,24 @@ for p in motor_pins:
 pwm1 = GPIO.PWM(EN_M1, 1000)
 pwm2 = GPIO.PWM(EN_M2, 1000)
 
-#Initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
+# Initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
 kit = ServoKit(channels=16)
+
+# Track current angle of extend servo (servo[1])
+current_extend_angle = 0
 
 # Setup voor Pi 5: CE op GPIO 25, CSN op SPI0 (CE0 / GPIO 8)
 radio = RF24(25, 0)
 
 # Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal)
-address = b"0001\x00" 
+address = b"0001\x00"
 
 # HC-SR04 pins (sonar sensor)
 TRIG1 = 5
 ECHO1 = 6
 
 TRIG2 = 12
-ECHO2 =13
+ECHO2 = 13
 
 # Ultrasone sensor pins
 GPIO.setup(TRIG1, GPIO.OUT)
@@ -57,9 +63,9 @@ GPIO.setup(ECHO1, GPIO.IN)
 GPIO.setup(TRIG2, GPIO.OUT)
 GPIO.setup(ECHO2, GPIO.IN)
 
-#relais pin / Solenoid valve
+# relais pin / Solenoid valve
 RELAY_PIN = 21
-START_BUTTON_PIN =20
+START_BUTTON_PIN = 20
 STOP_BUTTON_PIN = 16
 
 # Setup the pin in the setup section
@@ -70,39 +76,56 @@ GPIO.setup(STOP_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # =====================================================================================
 
 def initialize():
+    global current_extend_angle
+
     # initialize the system
-    #initializing the start speed of the DC motors
+    # initializing the start speed of the DC motors
     pwm1.start(0)
     pwm2.start(0)
 
-    #Desiding the initial angle that the servo which is attatched to Port 0 will be.
-    kit.servo[0].angle = 90
-    kit.servo[1].angle = 0
+    # Deciding the initial angle that the servos will be
+    kit.servo[0].angle = 90   # rotate servo
+    kit.servo[1].angle = 0    # extend servo
+    current_extend_angle = 0  # keep software in sync
+
+emergency_triggered = False
+
+def eStop(channel=None):
+    global state, emergency_triggered
+    print("\n!!! EMERGENCY STOP TRIGGERED !!!")
     
-    GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, 
-                      callback=emergency_stop_callback, 
-                      bouncetime=200)
-
-def emergency_stop_callback(channel):
-    print("!!! EMERGENCY STOP TRIGGERED !!!")
-    eStop()      # Call your existing stop function
-    sys.exit(0)  # Kill the program immediately
-    state = 10
-
-def eStop():
-    #turn off all moving parts and return to safe state
-    print("Emergency STOP button was pressed!")
-    stopDriving() #stop driving
+    # Set the flag so the main loop knows to stop
+    emergency_triggered = True
+    
+    # Physical stop actions
+    stopDriving()
     sleep(1)
-    extendArm(0) #retract arm
-    sleep(1)
-    rotateArm(90) #move arm into body
-     #go to standby
-    state = 10
+    extendArm(0)
+    #rotateArm(90)
+    
+    # OPTION A: Kill the program entirely (Safest)
+    print("Shutting down program for safety...")
+    os._exit(0)
+
+GPIO.add_event_detect(
+        STOP_BUTTON_PIN,
+        GPIO.FALLING,
+        callback=eStop,
+        bouncetime=200
+    )
+
+#def eStop(channel=None):
+    # turn off all moving parts and return to safe state
+#    global state
+#    print("Emergency STOP button was pressed!")
+#    stopDriving()       # stop driving
+#    extendArm(0)        # retract arm slowly
+#    rotateArm(90)       # move arm into body
+#    state = 10          # go to standby
 
 def measuringDistance1():
     # Distance sensor initialization - sensor measuring that a plant is nearby
-    # Trigger puls
+    # Trigger pulse
     GPIO.output(TRIG1, True)
     time.sleep(0.00001)
     GPIO.output(TRIG1, False)
@@ -112,7 +135,7 @@ def measuringDistance1():
     while GPIO.input(ECHO1) == 0:
         start_time = time.time()
 
-    # Waiting on echo einde
+    # Waiting on echo end
     stop_time = time.time()
     while GPIO.input(ECHO1) == 1:
         stop_time = time.time()
@@ -127,7 +150,7 @@ def measuringDistance1():
 
 def measuringDistance2():
     # Distance sensor initialization - sensor measuring that a plant is nearby
-    # Trigger puls
+    # Trigger pulse
     GPIO.output(TRIG2, True)
     time.sleep(0.00001)
     GPIO.output(TRIG2, False)
@@ -137,7 +160,7 @@ def measuringDistance2():
     while GPIO.input(ECHO2) == 0:
         start_time = time.time()
 
-    # Waiting on echo einde
+    # Waiting on echo end
     stop_time = time.time()
     while GPIO.input(ECHO2) == 1:
         stop_time = time.time()
@@ -151,6 +174,7 @@ def measuringDistance2():
     return distance2
 
 def plantFound():
+    global state
     while True:
         distance1 = measuringDistance1()
         distance2 = measuringDistance2()
@@ -203,8 +227,8 @@ def stopDriving():
 
 def receiveRemoteControlData():
     # handle nrf24l data reception
-    radio.begin() 
-    radio.setDataRate(RF24_250KBPS) # Slower air speed is more stable
+    radio.begin()
+    radio.setDataRate(RF24_250KBPS)  # Slower air speed is more stable
     radio.openReadingPipe(1, address)
     radio.setPALevel(RF24_PA_MIN)
     radio.startListening()
@@ -232,7 +256,8 @@ def radioLoop():
                 loop()
             except KeyboardInterrupt:
                 print("\nOntvanger gestopt.")
-#humidity = radio.array
+
+# humidity = radio.array
 
 def wateringTiming(i):
     receiveRemoteControlData()
@@ -243,18 +268,55 @@ def wateringTiming(i):
     elif humidity[i] > 30:
         wateringTime = 4
 
-def rotateArm(pos):
-    # control servo to move arm to pos
-    kit.servo[0].angle = pos
-############################################################
-def extendArm(pos):
-    # control servo to extend the arm
-    kit.servo[1].angle = pos
+def rotateArm(target_angle, step=1, delay=0.02):
+    """
+    Slowly extend/retract the arm on servo[1].
+    Moves from current_extend_angle to target_angle in small steps.
+    step  = degrees per step (smaller = smoother/slower)
+    delay = seconds between steps (larger = slower)
+    """
+    global current_extend_angle
 
+    start = int(current_extend_angle)
+    end = int(target_angle)
 
+    if end > start:
+        angle_range = range(start, end + 1, step)
+    else:
+        angle_range = range(start, end - 1, -step)
 
+    for angle in angle_range:
+        kit.servo[0].angle = angle
+        time.sleep(delay)
 
-#################################################################
+    current_extend_angle = target_angle
+
+    # control servo to move arm to pos (instant move)
+    #kit.servo[0].angle = pos
+
+def extendArm(target_angle, step=1, delay=0.02):
+    """
+    Slowly extend/retract the arm on servo[1].
+    Moves from current_extend_angle to target_angle in small steps.
+    step  = degrees per step (smaller = smoother/slower)
+    delay = seconds between steps (larger = slower)
+    """
+    global current_extend_angle
+
+    start = int(current_extend_angle)
+    end = int(target_angle)
+
+    if end > start:
+        angle_range = range(start, end + 1, step)
+    else:
+        angle_range = range(start, end - 1, -step)
+
+    for angle in angle_range:
+        kit.servo[1].angle = angle
+        time.sleep(delay)
+
+    current_extend_angle = target_angle
+
 def solenoidValveOpen():
     # If your relay is 'Active Low', use GPIO.LOW to turn it on
     GPIO.output(RELAY_PIN, GPIO.HIGH)
@@ -267,64 +329,76 @@ def solenoidValveClosed():
 
 def wateringPlant():
     solenoidValveOpen()
-    sleep(wateringTime) #wateringTime
+    sleep(wateringTime)  # wateringTime
     print(f"Watering time: {wateringTime}")
     solenoidValveClosed()
 
 # =========================================================================================
 # LOOP
 while True:
-    #if GPIO.input(STOP_BUTTON_PIN) == GPIO.LOW:  # Button pressed
-    #    print("Emergency STOP button was pressed!")
-    #    eStop()
+    # if GPIO.input(STOP_BUTTON_PIN) == GPIO.LOW:  # Button pressed
+    #     print("Emergency STOP button was pressed!")
+    #     eStop()
 
     match state:
         case 0:
             initialize()
             sleep(1)
             state = 10
-        case 10: # Standby, wait for start command
+
+        case 10:  # Standby, wait for start command
             print("Waiting for initialization")
             if GPIO.input(START_BUTTON_PIN) == GPIO.LOW:  # Button pressed
                 print("Button was pressed!")
-                state = 50
-        case 20: # Start driving until reached a plant
+                state = 20
+
+        case 20:  # Start driving until reached a plant
             startDrivingF()
             state = 30
-        case 30: # Driving stops because plant is reached
+
+        case 30:  # Driving stops because plant is reached
             plantFound()
-            sleep(2)
+            sleep(3)
             state = 40
-        case 40: # Arm is rotated outward to Left
+
+        case 40:  # Arm is rotated outward to Left
             rotateArm(0)
-            sleep(2)
+            sleep(3)
             state = 50
+
         case 50:
-            extendArm(180) # Arm is extended to first position
+            extendArm(160)  # Arm is extended to first position (slowly)
+            sleep(3)
             state = 70
+
         case 60:
-            wateringTiming(1) # Plant humidity value is received
+            wateringTiming(1)  # Plant humidity value is received
             state = 70
+
         case 70:
-            wateringPlant() # Solenoid valve opens and water goes to plant
+            wateringPlant()  # Solenoid valve opens and water goes to plant
             state = 51
+
         case 51:
-            extendArm(120) # Arm is extended to first position
-            sleep(2)
+            extendArm(180)  # Arm is extended further (slowly)
+            sleep(3)
             state = 71
+
         case 61:
-            wateringTiming(2) # Plant humidity value is received
+            wateringTiming(2)  # Plant humidity value is received
             state = 80
+
         case 71:
-            wateringPlant() # Solenoid valve opens and water goes to plant
+            wateringPlant()  # Solenoid valve opens and water goes to plant
             state = 80
+
         case 80:
-            extendArm(0) # Arm Retracts
-            sleep(2)
+            extendArm(0)  # Arm retract (slowly)
             state = 90
+
         case 90:
             rotateArm(90)
-            sleep(2)
             state = 20
+
         case 999:
             exit()

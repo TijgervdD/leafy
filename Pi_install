@@ -31,7 +31,7 @@ pip install --no-deps adafruit-circuitpython-servokit \
   adafruit-circuitpython-register \
   Adafruit-circuitpython-typing
 pip install typing-extensions --no-deps
-pip install adafruit-circuitpython-charlcd
+#pip install adafruit-circuitpython-charlcd
 
 Connecting GitHub: 
 sudo apt install -y gh
@@ -40,3 +40,34 @@ Go to git website (via command screen) and log in to get the code
 Fill in the code in the command screen and then 
 git clone https://github.com/TijgervdD/leafy.git
 Note: because it is a raspberry pi 5 the adafruit servomotor HAT software hass to be downloaded through such a way, otherwise you get a GPIO error. This is because of the software differences between pi 5 and younger Pi’s
+
+
+
+##### Starting command
+[Unit]
+Description=My Python Project Service
+After=network.target
+
+[Service]
+# Replace 'pi' with your actual username if different
+User=grp2 
+# The directory where your script lives
+WorkingDirectory=/home/grp2/leafy
+# Path to the python executable INSIDE your venv + path to your script
+ExecStart=/home/grp2/codeEnv/env/bin/python /home/grp2/leafy/finalBeast.py
+Restart=always
+# StandardOutput and StandardError help with debugging later
+StandardOutput=inherit
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target 
+
+
+#################
+sudo systemctl daemon-reload
+sudo systemctl enable myscript.service
+sudo systemctl start myscript.service
+
+################## check if code is in start up: 
+sudo systemctl status myscript.service

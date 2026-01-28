@@ -11,6 +11,7 @@ from adafruit_servokit import ServoKit
 import sys
 import time
 from pyrf24 import RF24, RF24_PA_MIN
+import os
 
 GPIO.setmode(GPIO.BCM)
 
@@ -86,21 +87,40 @@ def initialize():
     kit.servo[1].angle = 0    # extend servo
     current_extend_angle = 0  # keep software in sync
 
-    GPIO.add_event_detect(
+emergency_triggered = False
+
+def eStop(channel=None):
+    global state, emergency_triggered
+    print("\n!!! EMERGENCY STOP TRIGGERED !!!")
+    
+    # Set the flag so the main loop knows to stop
+    emergency_triggered = True
+    
+    # Physical stop actions
+    stopDriving()
+    sleep(1)
+    extendArm(0)
+    #rotateArm(90)
+    
+    # OPTION A: Kill the program entirely (Safest)
+    print("Shutting down program for safety...")
+    os._exit(0)
+
+GPIO.add_event_detect(
         STOP_BUTTON_PIN,
         GPIO.FALLING,
         callback=eStop,
         bouncetime=200
     )
 
-def eStop(channel=None):
+#def eStop(channel=None):
     # turn off all moving parts and return to safe state
-    global state
-    print("Emergency STOP button was pressed!")
-    stopDriving()       # stop driving
-    extendArm(0)        # retract arm slowly
-    rotateArm(90)       # move arm into body
-    state = 10          # go to standby
+#    global state
+#    print("Emergency STOP button was pressed!")
+#    stopDriving()       # stop driving
+#    extendArm(0)        # retract arm slowly
+#    rotateArm(90)       # move arm into body
+#    state = 10          # go to standby
 
 def measuringDistance1():
     # Distance sensor initialization - sensor measuring that a plant is nearby
@@ -247,9 +267,31 @@ def wateringTiming(i):
     elif humidity[i] > 30:
         wateringTime = 4
 
-def rotateArm(pos):
+def rotateArm(target_angle, step=1, delay=0.02):
+    """
+    Slowly extend/retract the arm on servo[1].
+    Moves from current_extend_angle to target_angle in small steps.
+    step  = degrees per step (smaller = smoother/slower)
+    delay = seconds between steps (larger = slower)
+    """
+    global current_extend_angle
+
+    start = int(current_extend_angle)
+    end = int(target_angle)
+
+    if end > start:
+        angle_range = range(start, end + 1, step)
+    else:
+        angle_range = range(start, end - 1, -step)
+
+    for angle in angle_range:
+        kit.servo[0].angle = angle
+        time.sleep(delay)
+
+    current_extend_angle = target_angle
+
     # control servo to move arm to pos (instant move)
-    kit.servo[0].angle = pos
+    #kit.servo[0].angle = pos
 
 def extendArm(target_angle, step=1, delay=0.02):
     """
@@ -324,7 +366,7 @@ while True:
             state = 50
 
         case 50:
-            extendArm(40)  # Arm is extended to first position (slowly)
+            extendArm(160)  # Arm is extended to first position (slowly)
             sleep(3)
             state = 70
 
@@ -337,7 +379,7 @@ while True:
             state = 51
 
         case 51:
-            extendArm(80)  # Arm is extended further (slowly)
+            extendArm(180)  # Arm is extended further (slowly)
             sleep(3)
             state = 71
 
