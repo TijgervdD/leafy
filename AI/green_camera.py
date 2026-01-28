@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt  # Voor visualisatie
 # ------------------------------------------------------------
 # HANDMATIGE INPUT
 # ------------------------------------------------------------
-SOIL_HUMIDITY = 40.0  # Huidige bodemvochtigheid in %
+SOIL_HUMIDITY = humidi  # Huidige bodemvochtigheid in %
 
 # ------------------------------------------------------------
 # HSV WAARDES VOOR GROEN DETECTIE

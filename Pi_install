@@ -31,6 +31,7 @@ pip install --no-deps adafruit-circuitpython-servokit \
   adafruit-circuitpython-register \
   Adafruit-circuitpython-typing
 pip install typing-extensions --no-deps
+pip install adafruit-circuitpython-charlcd
 
 Connecting GitHub: 
 sudo apt install -y gh
