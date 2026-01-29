@@ -42,12 +42,6 @@ kit = ServoKit(channels=16)
 # Track current angle of extend servo (servo[1])
 current_extend_angle = 0
 
-# Setup voor Pi 5: CE op GPIO 25, CSN op SPI0 (CE0 / GPIO 8)
-radio = RF24(25, 0)
-
-# Adres MOET exact "0001" zijn zoals in je Arduino code (5 bytes totaal)
-address = b"0001\x00"
-
 # HC-SR04 pins (sonar sensor)
 TRIG1 = 5
 ECHO1 = 6
@@ -91,7 +85,7 @@ def initialize():
     current_extend_angle = 0  # keep software in sync
     current_rotate_angle = 90  # keep software in sync
 
-emergency_triggered = False
+#emergency_triggered = False
 
 def eStop(channel=None):
     global state, emergency_triggered
@@ -110,12 +104,12 @@ def eStop(channel=None):
     print("Shutting down program for safety...")
     os._exit(0)
 
-GPIO.add_event_detect(
-        STOP_BUTTON_PIN,
-        GPIO.FALLING,
-        callback=eStop,
-        bouncetime=200
-    )
+#GPIO.add_event_detect(
+#        STOP_BUTTON_PIN,
+#        GPIO.FALLING,
+#        callback=eStop,
+#        bouncetime=200
+#    )
 
 def measuringDistance1():
     # Distance sensor initialization - sensor measuring that a plant is nearby
@@ -219,42 +213,9 @@ def stopDriving():
     GPIO.output(IN1_M2, GPIO.LOW)
     GPIO.output(IN2_M2, GPIO.LOW)
 
-def receiveRemoteControlData():
-    # handle nrf24l data reception
-    radio.begin()
-    radio.setDataRate(RF24_250KBPS)  # Slower air speed is more stable
-    radio.openReadingPipe(1, address)
-    radio.setPALevel(RF24_PA_MIN)
-    radio.startListening()
-    radio.printDetails()
-
-def radioLoop():
-    while True:
-        if radio.available():
-            # We lezen 32 bytes (zoals de Arduino char buffer)
-            payload = radio.read(32)
-            
-            try:
-                # Decodeer de bytes en verwijder lege karakters
-                text = payload.decode('utf-8').rstrip('\x00')
-                if text:
-                    print(f"Ontvangen: {text}")
-            except Exception as e:
-                print(f"Data ontvangen (geen tekst): {payload}")
-        
-        time.sleep(0.01)
-
-        if __name__ == "__main__":
-            setup()
-            try:
-                loop()
-            except KeyboardInterrupt:
-                print("\nOntvanger gestopt.")
-
-# humidity = radio.array
 
 def wateringTiming(i):
-    receiveRemoteControlData()
+    #receiveRemoteControlData()
     if humidity[i] > 50:
         wateringTime = 0
     elif humidity[i] > 40:
