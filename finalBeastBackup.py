@@ -17,6 +17,19 @@ GPIO.setmode(GPIO.BCM)
 
 # ==============================================================================
 # PIN layout and initial setup
+# HC-SR04 pins (sonar sensor)
+TRIG1 = 5
+ECHO1 = 6
+
+TRIG2 = 12
+ECHO2 = 13
+
+
+# relais pin / Solenoid valve
+RELAY_PIN = 19
+START_BUTTON_PIN = 16
+STOP_BUTTON_PIN = 21
+
 # --- PIN DEFINITIONS ---
 IN1_M1, IN2_M1, EN_M1 = 23, 22, 24
 IN1_M2, IN2_M2, EN_M2 = 27, 18, 17
@@ -57,20 +70,6 @@ pwm2 = GPIO.PWM(EN_M2, 1000)
 kit = ServoKit(channels=16)
 
 # Track current angle of extend servo (servo[1])
-
-
-# HC-SR04 pins (sonar sensor)
-TRIG1 = 5
-ECHO1 = 6
-
-TRIG2 = 12
-ECHO2 = 13
-
-
-# relais pin / Solenoid valve
-RELAY_PIN = 19
-START_BUTTON_PIN = 16
-STOP_BUTTON_PIN = 21
 
 
 # =====================================================================================
