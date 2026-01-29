@@ -12,8 +12,12 @@ from adafruit_servokit import ServoKit
 import sys
 import time
 import os
-GPIO.cleanup()
-GPIO.setmode(GPIO.BCM)
+try:
+    # On Pi 5, this clears the lgpio chip handle
+    GPIO.setmode(GPIO.BCM)
+    GPIO.cleanup()
+except:
+    pass
 
 # ==============================================================================
 # PIN layout and initial setup
