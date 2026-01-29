@@ -91,7 +91,7 @@ def eStop(channel=None):
     os._exit(0)
 
 # Interrupt for Emergency Stop
-GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, callback=eStop, bouncetime=200)
+#GPIO.add_event_detect(STOP_BUTTON_PIN, GPIO.FALLING, callback=eStop, bouncetime=200)
 
 def measuringDistance1():
     GPIO.output(TRIG1, True)
@@ -142,11 +142,16 @@ def plantFound():
         time.sleep(0.1)
 
 def startDrivingF():
-    GPIO.output(IN1_M1, GPIO.HIGH); GPIO.output(IN2_M1, GPIO.LOW)
+    # Motor 1
+    GPIO.output(IN1_M1, GPIO.LOW)
+    GPIO.output(IN2_M1, GPIO.HIGH)
     pwm1.ChangeDutyCycle(speed)
-    GPIO.output(IN1_M2, GPIO.HIGH); GPIO.output(IN2_M2, GPIO.LOW)
-    pwm2.ChangeDutyCycle(speed)
 
+    # Motor 2
+    GPIO.output(IN1_M2, GPIO.LOW)
+    GPIO.output(IN2_M2, GPIO.HIGH)
+    pwm2.ChangeDutyCycle(speed)
+    
 def stopDriving():
     pwm1.ChangeDutyCycle(0)
     pwm2.ChangeDutyCycle(0)
