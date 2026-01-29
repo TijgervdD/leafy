@@ -17,6 +17,31 @@ GPIO.setmode(GPIO.BCM)
 
 # ==============================================================================
 # PIN layout and initial setup
+# Motor 1
+IN1_M1 = 23  # 17
+IN2_M1 = 22  # 18
+EN_M1 = 24   # PWM voor motor 1
+
+# Motor 2
+IN1_M2 = 27  # 22
+IN2_M2 = 18  # 27
+EN_M2 = 17   # PWM voor motor 2
+
+# Setup pins
+motor_pins = [IN1_M1, IN2_M1, EN_M1, IN1_M2, IN2_M2, EN_M2]
+for p in motor_pins:
+    GPIO.setup(p, GPIO.OUT)
+
+# PWM op beide motoren
+pwm1 = GPIO.PWM(EN_M1, 1000)
+pwm2 = GPIO.PWM(EN_M2, 1000)
+
+# Initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
+kit = ServoKit(channels=16)
+
+# Track current angle of extend servo (servo[1])
+
+
 # HC-SR04 pins (sonar sensor)
 TRIG1 = 5
 ECHO1 = 6
@@ -24,53 +49,22 @@ ECHO1 = 6
 TRIG2 = 12
 ECHO2 = 13
 
+# Ultrasone sensor pins
+GPIO.setup(TRIG1, GPIO.OUT)
+GPIO.setup(ECHO1, GPIO.IN)
+
+GPIO.setup(TRIG2, GPIO.OUT)
+GPIO.setup(ECHO2, GPIO.IN)
 
 # relais pin / Solenoid valve
 RELAY_PIN = 19
 START_BUTTON_PIN = 16
 STOP_BUTTON_PIN = 21
 
-# --- PIN DEFINITIONS ---
-IN1_M1, IN2_M1, EN_M1 = 23, 22, 24
-IN1_M2, IN2_M2, EN_M2 = 27, 18, 17
-
-# Create a master list of ALL pins used in the script
-# This ensures we don't miss any or double-up
-output_pins = [IN1_M1, IN2_M1, EN_M1, IN1_M2, IN2_M2, EN_M2, TRIG1, TRIG2, RELAY_PIN]
-input_pins = [ECHO1, ECHO2, START_BUTTON_PIN, STOP_BUTTON_PIN]
-
-# --- PHYSICAL SETUP (Do this ONLY once) ---
-# 1. Clean up any previous "stuck" allocations
-try:
-    GPIO.cleanup()
-except:
-    pass
-
-GPIO.setmode(GPIO.BCM)
-
-# 2. Setup all outputs in one go
-for pin in output_pins:
-    GPIO.setup(pin, GPIO.OUT)
-
-# 3. Setup all inputs in one go
-for pin in input_pins:
-    # Note: Trigger and Echo don't usually need pull-ups, 
-    # but buttons definitely do.
-    if pin in [START_BUTTON_PIN, STOP_BUTTON_PIN]:
-        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    else:
-        GPIO.setup(pin, GPIO.IN)
-
-# 4. Initialize PWM (This links to the EN pins already set as OUT)
-pwm1 = GPIO.PWM(EN_M1, 1000)
-pwm2 = GPIO.PWM(EN_M2, 1000)
-
-#################
-# Initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
-kit = ServoKit(channels=16)
-
-# Track current angle of extend servo (servo[1])
-
+# Setup the pin in the setup section
+GPIO.setup(RELAY_PIN, GPIO.OUT)
+GPIO.setup(START_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(STOP_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # =====================================================================================
 
