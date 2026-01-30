@@ -240,7 +240,7 @@ def rotateArm(target_angle, step=1, delay=0.1):
     # control servo to move arm to pos (instant move)
     #kit.servo[0].angle = pos
 
-def extendArm(target_angle, step=1, delay=0.02):
+def extendArm(target_angle, step=1, delay=0.01):
     """
     Slowly extend/retract the arm on servo[1].
     Moves from current_extend_angle to target_angle in small steps.
