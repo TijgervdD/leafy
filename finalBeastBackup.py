@@ -14,8 +14,6 @@ import time
 import os
     # On Pi 5, this clears the lgpio chip handle
 GPIO.setmode(GPIO.BCM)
-GPIO.cleanup()
-
 
 # ==============================================================================
 # PIN layout and initial setup
@@ -40,9 +38,6 @@ pwm2 = GPIO.PWM(EN_M2, 1000)
 
 # Initialising statement stating that we will have access to 16 PWM channels of the HAT and to summon them we will use | kit |
 kit = ServoKit(channels=16)
-
-# Track current angle of extend servo (servo[1])
-
 
 # HC-SR04 pins (sonar sensor)
 TRIG1 = 5
@@ -89,14 +84,14 @@ def initialize():
     current_extend_angle = 0  # keep software in sync
     current_rotate_angle = 90  # keep software in sync
 
-emergency_triggered = False
+#emergency_triggered = False
 
 def eStop(channel=None):
     global state, emergency_triggered
     print("\n!!! EMERGENCY STOP TRIGGERED !!!")
     
     # Set the flag so the main loop knows to stop
-    emergency_triggered = True
+    #emergency_triggered = True
     
     # Physical stop actions
     #stopDriving()
@@ -106,8 +101,8 @@ def eStop(channel=None):
     #rotateArm(90)
     
     # OPTION A: Kill the program entirely (Safest)
-    print("Shutting down program for safety...")
-    os._exit(0)
+    #print("Shutting down program for safety...")
+    #os._exit(0)
 
 #GPIO.add_event_detect(
 #        STOP_BUTTON_PIN,
@@ -326,7 +321,7 @@ while True:
         case 50:
             extendArm(120)# Arm is extended to first position (slowly)
             sleep(3)
-            state = 80
+            state = 60
 
         case 60:
             wateringPlant()  # Solenoid valve opens and water goes to plant
@@ -347,7 +342,7 @@ while True:
 
         case 90:
             rotateArm(90)
-            state = 20
+            state = 10
 
         case 999:
             exit()
