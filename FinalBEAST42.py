@@ -319,7 +319,7 @@ while True:
             state = 50
 
         case 50:
-            extendArm(90)# Arm is extended to first position (slowly)
+            extendArm(70)# Arm is extended to first position (slowly)
             sleep(3)
             state = 60
 
@@ -328,7 +328,7 @@ while True:
             state = 51
 
         case 51:
-            extendArm(120) # Arm is extended further (slowly)
+            extendArm(70) # Arm is extended further (slowly)
             sleep(3)
             state = 71
 
