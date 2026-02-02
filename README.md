@@ -1,5 +1,9 @@
 # Project LEAFY
 
+pi login:
+username: grp2
+password: leafy123
+
 The code to run the robot is called "FinalBEAST42"
 
 The AI code to test how green a plant is and if it needs water is called "Green\_plant\_test.py"
